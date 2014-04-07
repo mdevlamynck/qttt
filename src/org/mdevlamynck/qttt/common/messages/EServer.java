@@ -1,0 +1,19 @@
+package org.mdevlamynck.qttt.common.messages;
+
+public enum EServer {
+	
+	CLIENT_CONNECTED,
+	CLIENT_INVALID_CONNECTION,
+	
+	SERVER_STOPPING,
+	
+	GAME_START,
+	GAME_REQUEST_TURN,
+	GAME_REQUEST_CHOICE,
+	GAME_OTHER_TURN,
+	GAME_OTHER_CHOICE,
+	GAME_FINISHED,
+	
+	EMPTY_MESSAGE
+
+}
