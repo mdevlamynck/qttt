@@ -109,7 +109,9 @@ public class GameServer {
 				waitingClient = client;
 			else
 			{
-				GameSessionHandler g = new GameSessionHandler(waitingClient, client);
+				GameSessionHandler g	= new GameSessionHandler(waitingClient, client);
+				waitingClient			= null;
+				
 				sessions.add(g);
 				g.start();
 			}
