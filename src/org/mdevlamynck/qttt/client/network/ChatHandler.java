@@ -1,7 +1,7 @@
 package org.mdevlamynck.qttt.client.network;
 
 import org.mdevlamynck.qttt.client.GameClient;
-import org.mdevlamynck.qttt.common.messages.EServer;
+import org.mdevlamynck.qttt.common.network.EMessages;
 import org.mdevlamynck.qttt.common.network.datastruct.Client;
 
 public class ChatHandler extends Thread {
@@ -19,11 +19,20 @@ public class ChatHandler extends Thread {
 	public void run()
 	{
 		while(!controller.getQuit())
-			controller.addToChat(server.chat.pop(), true);;
+		{
+			try
+			{
+				controller.addToChat(server.chat.pop(), true);
+			}
+			catch(InterruptedException e)
+			{
+			}
+		}
+			
 	}
 
 	public void sendChatMessg(String sendText) {
-		server.out.println(EServer.CHAT_PREFIX.toString() + sendText);
+		server.out.println(EMessages.CHAT_PREFIX.toString() + sendText);
 	}
 
 }

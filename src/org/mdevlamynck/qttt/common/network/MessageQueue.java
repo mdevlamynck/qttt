@@ -21,16 +21,11 @@ public class MessageQueue {
 		}
 	}
 	
-	public String pop()
+	public String pop() throws InterruptedException
 	{
 		synchronized (messages) {
 			while(messages.isEmpty())
-				try {
 					messages.wait();
-				} catch (InterruptedException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
 			
 			return messages.remove();
 		}

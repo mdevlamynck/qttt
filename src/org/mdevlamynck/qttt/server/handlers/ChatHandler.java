@@ -1,32 +1,41 @@
 package org.mdevlamynck.qttt.server.handlers;
 
-import org.mdevlamynck.qttt.common.messages.EServer;
+import org.mdevlamynck.qttt.common.network.EMessages;
 import org.mdevlamynck.qttt.common.network.datastruct.Client;
 
 public class ChatHandler extends Thread {
 	
-	private Client			p1;
-	private Client			p2;
+	private GameSessionHandler	game	= null;
+	private Client				p1		= null;
+	private Client				p2		= null;
 	
-	public ChatHandler(Client p1, Client p2)
+	public ChatHandler(GameSessionHandler game, Client p1, Client p2)
 	{
-		this.p1 = p1;
-		this.p2 = p2;
+		this.game	= game;
+		this.p1		= p1;
+		this.p2		= p2;
 	}
 	
 	@Override
 	public void run()
 	{
-		while(true)
+		while(!game.getQuit())
 		{
-			String line = p1.chat.pop();
-			writeLine(p2, line);
+			try
+			{
+				String line = p1.chat.pop();
+				writeLine(p2, line);
+			}
+			catch(InterruptedException e)
+			{
+				
+			}
 		}
 	}
 
 	private void writeLine(Client client, String line)
 	{
-		client.out.println(EServer.CHAT_PREFIX.toString() + line);
+		client.out.println(EMessages.CHAT_PREFIX.toString() + line);
 	}
 
 }

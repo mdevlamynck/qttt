@@ -6,7 +6,7 @@ import java.net.Socket;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.mdevlamynck.qttt.common.messages.EServer;
+import org.mdevlamynck.qttt.common.network.EMessages;
 import org.mdevlamynck.qttt.common.network.datastruct.Client;
 import org.mdevlamynck.qttt.server.handlers.ClientReaderHandler;
 import org.mdevlamynck.qttt.server.handlers.GameSessionHandler;
@@ -92,7 +92,7 @@ public class GameServer {
 			Socket			server	= new Socket("localhost", 42042);
 			PrintWriter		out		= new PrintWriter(server.getOutputStream(), true);
 			
-			out.println(EServer.EMPTY_MESSAGE);
+			out.println(EMessages.EMPTY_MESSAGE);
 		}
 		catch (Exception e)
 		{

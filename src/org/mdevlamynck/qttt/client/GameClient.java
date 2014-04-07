@@ -183,4 +183,8 @@ public class GameClient extends JFrame {
 		return quit;
 	}
 
+	public void quit() {
+		quit = true;
+	}
+
 }

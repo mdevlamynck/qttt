@@ -4,8 +4,7 @@ import java.io.PrintWriter;
 import java.net.Socket;
 import java.util.Scanner;
 
-import org.mdevlamynck.qttt.common.messages.EClient;
-import org.mdevlamynck.qttt.common.messages.EServer;
+import org.mdevlamynck.qttt.common.network.EMessages;
 import org.mdevlamynck.qttt.common.network.datastruct.Client;
 import org.mdevlamynck.qttt.server.GameServer;
 
@@ -54,9 +53,9 @@ public class ClientReaderHandler extends Thread {
 			{
 				String message = client.in.nextLine();
 				
-				if		(message.equals(EClient.SERVER_STOP.toString()))
+				if		(message.equals(EMessages.SERVER_STOP.toString()))
 				{
-					client.out.println(EServer.SERVER_STOPPING);
+					client.out.println(EMessages.SERVER_STOPPING);
 					client.out.flush();
 					
 					quit = true;
@@ -64,11 +63,11 @@ public class ClientReaderHandler extends Thread {
 					
 					server.quit();
 				}
-				else if	(message.startsWith(EServer.GAME_PREFIX.toString()))
-					client.game.push(message.substring(EServer.GAME_PREFIX.toString().length()));
+				else if	(message.startsWith(EMessages.GAME_PREFIX.toString()))
+					client.game.push(message.substring(EMessages.GAME_PREFIX.toString().length()));
 				
-				else if	(message.startsWith(EServer.CHAT_PREFIX.toString()))
-					client.chat.push(message.substring(EServer.CHAT_PREFIX.toString().length()));
+				else if	(message.startsWith(EMessages.CHAT_PREFIX.toString()))
+					client.chat.push(message.substring(EMessages.CHAT_PREFIX.toString().length()));
 			}
 		}
 		catch(Exception e)
