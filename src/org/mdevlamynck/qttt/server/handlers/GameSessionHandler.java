@@ -1,24 +1,21 @@
 package org.mdevlamynck.qttt.server.handlers;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import org.mdevlamynck.qttt.common.gamelogic.GameLogic;
 import org.mdevlamynck.qttt.common.gamelogic.IHMBackend;
 import org.mdevlamynck.qttt.common.gamelogic.datastruct.GameResult;
 import org.mdevlamynck.qttt.common.gamelogic.datastruct.Turn;
 import org.mdevlamynck.qttt.common.messages.EServer;
-import org.mdevlamynck.qttt.server.datastruct.Client;
+import org.mdevlamynck.qttt.common.network.datastruct.Client;
 
 public class GameSessionHandler extends Thread implements IHMBackend {
 	
 	private Client			p1;
 	private Client			p2;
 	
-	private List<Client>	spectators		= new ArrayList<Client>();
-	private List<Client>	allConnected	= new ArrayList<Client>();
-	
 	private GameLogic		gl				= null;
+	
+	private ChatHandler		chatFromP1		= null;
+	private ChatHandler		chatFromP2		= null;
 	
 	public GameSessionHandler(Client p1, Client p2)
 	{
@@ -28,10 +25,16 @@ public class GameSessionHandler extends Thread implements IHMBackend {
 		p1.session = this;
 		p2.session = this;
 		
-		p1.out.println(EServer.GAME_START);
-		p1.out.println("1");
-		p2.out.println(EServer.GAME_START);
-		p2.out.println("2");
+		writeLine(p1, EServer.GAME_START.toString());
+		writeLine(p1, "1");
+		writeLine(p2, EServer.GAME_START.toString());
+		writeLine(p2, "2");
+		
+		chatFromP1 = new ChatHandler(p1, p2);
+		chatFromP2 = new ChatHandler(p2, p1);
+		
+		chatFromP1.start();
+		chatFromP2.start();
 	}
 	
 	@Override
@@ -44,7 +47,7 @@ public class GameSessionHandler extends Thread implements IHMBackend {
 		}
 		catch(Exception e)
 		{
-			System.err.println(e.getMessage());
+			System.err.println("GSH-R " + e.getMessage());
 		}
 	}
 
@@ -58,9 +61,9 @@ public class GameSessionHandler extends Thread implements IHMBackend {
 		else
 			player = p2;
 				
-		player.out.println(EServer.GAME_REQUEST_TURN);
+		writeLine(player, EServer.GAME_REQUEST_TURN.toString());
 		turn	= new Turn();
-		turn.fromString(player.in.nextLine());
+		turn.fromString(player.game.pop());
 		
 		return turn;
 	}
@@ -75,20 +78,19 @@ public class GameSessionHandler extends Thread implements IHMBackend {
 		else
 			player = p2;
 		
-		player.out.println(EServer.GAME_REQUEST_CHOICE);
-		choose = player.in.nextInt();
-		player.in.nextLine();
+		writeLine(player, EServer.GAME_REQUEST_CHOICE.toString());
+		choose = Integer.parseInt(player.game.pop());
 		
 		return choose;
 	}
 
 	@Override
 	public void gameFinished(GameResult result) {
-		p1.out.println(EServer.GAME_FINISHED);
-		p1.out.println(result.toString());
+		writeLine(p1, EServer.GAME_FINISHED.toString());
+		writeLine(p1, result.toString());
 			
-		p2.out.println(EServer.GAME_FINISHED);
-		p2.out.println(result.toString());
+		writeLine(p2, EServer.GAME_FINISHED.toString());
+		writeLine(p2, result.toString());
 	}
 
 	@Override
@@ -96,20 +98,25 @@ public class GameSessionHandler extends Thread implements IHMBackend {
 		if(turn == null)
 			return;
 		
-		p1.out.println(EServer.GAME_OTHER_TURN);
-		p1.out.println(turn.toString());
+		writeLine(p1, EServer.GAME_OTHER_TURN.toString());
+		writeLine(p1, turn.toString());
 			
-		p2.out.println(EServer.GAME_OTHER_TURN);
-		p2.out.println(turn.toString());
+		writeLine(p2, EServer.GAME_OTHER_TURN.toString());
+		writeLine(p2, turn.toString());
 	}
 
 	@Override
 	public void choice(int choice) {
-		p1.out.println(EServer.GAME_OTHER_CHOICE);
-		p1.out.println(((Integer)choice).toString());
+		writeLine(p1, EServer.GAME_OTHER_CHOICE.toString());
+		writeLine(p1, ((Integer)choice).toString());
 			
-		p2.out.println(EServer.GAME_OTHER_CHOICE);
-		p2.out.println(((Integer)choice).toString());
+		writeLine(p2, EServer.GAME_OTHER_CHOICE.toString());
+		writeLine(p2, ((Integer)choice).toString());
+	}
+	
+	private void writeLine(Client client, String line)
+	{
+		client.out.println(EServer.GAME_PREFIX.toString() + line);
 	}
 
 }

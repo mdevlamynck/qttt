@@ -7,7 +7,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.mdevlamynck.qttt.common.messages.EServer;
-import org.mdevlamynck.qttt.server.datastruct.Client;
+import org.mdevlamynck.qttt.common.network.datastruct.Client;
 import org.mdevlamynck.qttt.server.handlers.ClientReaderHandler;
 import org.mdevlamynck.qttt.server.handlers.GameSessionHandler;
 

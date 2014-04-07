@@ -3,10 +3,13 @@ package org.mdevlamynck.qttt.client;
 import javax.swing.JFrame;
 
 import org.mdevlamynck.qttt.client.gui.MainPanel;
-import org.mdevlamynck.qttt.client.network.NetworkHandler;
+import org.mdevlamynck.qttt.client.network.ChatHandler;
+import org.mdevlamynck.qttt.client.network.GameSessionHandler;
+import org.mdevlamynck.qttt.client.network.NetworkInputHandler;
 import org.mdevlamynck.qttt.common.gamelogic.GameLogic;
 import org.mdevlamynck.qttt.common.gamelogic.datastruct.GridSquare;
 import org.mdevlamynck.qttt.common.gamelogic.datastruct.Turn;
+import org.mdevlamynck.qttt.common.network.datastruct.Client;
 
 public class GameClient extends JFrame {
 
@@ -18,12 +21,18 @@ public class GameClient extends JFrame {
 	
 	private Turn				lastSelected		= new Turn();
 	private	int					squareSelected		= 0;
+	
+	private Client				server				= new Client();
 
-	private NetworkHandler		network				= new NetworkHandler(this);
+	private NetworkInputHandler	network				= new NetworkInputHandler(this, server);
+	private GameSessionHandler	game				= new GameSessionHandler(this, server);
+	private ChatHandler			chat				= new ChatHandler(this, server);
 	
 	private boolean				needTurn			= false;
 	
 	private GridSquare[][]		grid				= null;
+	
+	private	boolean				quit				= false;
 	
 	public GameClient()
 	{
@@ -33,12 +42,15 @@ public class GameClient extends JFrame {
 		add(view);
 		setSize(300, 150);
 
-		resetGame();	
+		resetGame();
+		view.init();
 		view.updateRender();
 		
 		view.enableSquares(false);
 
 		network.start();
+		game.start();
+		chat.start();
 	}
 
 	public void selected(int col, int row)
@@ -56,6 +68,13 @@ public class GameClient extends JFrame {
 					lastSelected.notify();
 			}
 		}
+	}
+
+	public void sendChat() {
+		String text = view.getSendText();
+		chat.sendChatMessg(text);
+		view.clearSendText();
+		view.addToChat(text, false);
 	}
 
 	public Turn getTurn()
@@ -132,23 +151,36 @@ public class GameClient extends JFrame {
 	{
 		gl		= new GameLogic(null);
 		grid	= gl.getGrid();
-		
-		view.resetGame();
 	}
 	
-	public void addToLog(String text)
+	public void addToLog(String text, boolean isIn)
 	{
-		view.addToLog(text);
+		view.addToLog(text, isIn);
 	}
 	
 	public void clearLog()
 	{
 		view.clearLog();
 	}
+
+	public void addToChat(String text, boolean isIn)
+	{
+		view.addToChat(text, isIn);
+	}
+	
+	public void clearChat()
+	{
+		view.clearChat();
+	}
 	
 	public GridSquare[][] getGrid()
 	{
 		return grid;
+	}
+	
+	public boolean getQuit()
+	{
+		return quit;
 	}
 
 }

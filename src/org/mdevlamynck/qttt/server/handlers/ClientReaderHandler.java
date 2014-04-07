@@ -6,8 +6,8 @@ import java.util.Scanner;
 
 import org.mdevlamynck.qttt.common.messages.EClient;
 import org.mdevlamynck.qttt.common.messages.EServer;
+import org.mdevlamynck.qttt.common.network.datastruct.Client;
 import org.mdevlamynck.qttt.server.GameServer;
-import org.mdevlamynck.qttt.server.datastruct.Client;
 
 public class ClientReaderHandler extends Thread {
 	
@@ -37,7 +37,7 @@ public class ClientReaderHandler extends Thread {
 		}
 		catch(Exception e)
 		{
-			System.err.println(e.getMessage());
+			System.err.println("CRH-C " + e.getMessage());
 		}
 	}
 
@@ -50,14 +50,11 @@ public class ClientReaderHandler extends Thread {
 		try
 		{
 			server.addClient(client);
-			/*
 			while(!quit && !server.getQuit())
 			{
 				String message = client.in.nextLine();
 				
-				System.out.println(message);
-				
-				if(message.equals(EClient.SERVER_STOP.toString()))
+				if		(message.equals(EClient.SERVER_STOP.toString()))
 				{
 					client.out.println(EServer.SERVER_STOPPING);
 					client.out.flush();
@@ -67,12 +64,16 @@ public class ClientReaderHandler extends Thread {
 					
 					server.quit();
 				}
+				else if	(message.startsWith(EServer.GAME_PREFIX.toString()))
+					client.game.push(message.substring(EServer.GAME_PREFIX.toString().length()));
+				
+				else if	(message.startsWith(EServer.CHAT_PREFIX.toString()))
+					client.chat.push(message.substring(EServer.CHAT_PREFIX.toString().length()));
 			}
-			*/
 		}
 		catch(Exception e)
 		{
-			System.err.println(e.getMessage());
+			System.err.println("CRH-R " + e.getMessage());
 		}
 		
 		System.out.println("Handling Client Done");
