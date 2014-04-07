@@ -1,4 +1,4 @@
-package org.mdevlamynck.qttt.common.gamelogic;
+package org.mdevlamynck.qttt.common.gamelogic.datastruct;
 
 import java.util.Hashtable;
 

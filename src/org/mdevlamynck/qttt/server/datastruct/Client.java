@@ -1,4 +1,4 @@
-package org.mdevlamynck.qttt.server;
+package org.mdevlamynck.qttt.server.datastruct;
 
 import java.io.PrintWriter;
 import java.net.Socket;

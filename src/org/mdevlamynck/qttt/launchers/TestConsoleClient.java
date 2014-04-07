@@ -3,12 +3,12 @@ package org.mdevlamynck.qttt.launchers;
 import java.util.Scanner;
 
 import org.mdevlamynck.qttt.common.gamelogic.GameLogic;
-import org.mdevlamynck.qttt.common.gamelogic.GameResult;
-import org.mdevlamynck.qttt.common.gamelogic.GridSquare;
-import org.mdevlamynck.qttt.common.gamelogic.GridSquare.EPlayer;
 import org.mdevlamynck.qttt.common.gamelogic.IHMBackend;
-import org.mdevlamynck.qttt.common.gamelogic.Turn;
-import org.mdevlamynck.qttt.common.gamelogic.Turn.Pos;
+import org.mdevlamynck.qttt.common.gamelogic.datastruct.GameResult;
+import org.mdevlamynck.qttt.common.gamelogic.datastruct.GridSquare;
+import org.mdevlamynck.qttt.common.gamelogic.datastruct.Turn;
+import org.mdevlamynck.qttt.common.gamelogic.datastruct.GridSquare.EPlayer;
+import org.mdevlamynck.qttt.common.gamelogic.datastruct.Turn.Pos;
 
 public class TestConsoleClient implements IHMBackend{
 	

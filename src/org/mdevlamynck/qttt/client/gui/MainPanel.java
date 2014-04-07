@@ -2,50 +2,36 @@ package org.mdevlamynck.qttt.client.gui;
 
 import java.awt.GridLayout;
 import java.awt.Panel;
-import java.util.concurrent.locks.Lock;
-import java.util.concurrent.locks.ReentrantLock;
 
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JTextArea;
 
-import org.mdevlamynck.qttt.client.network.NetworkHandler;
-import org.mdevlamynck.qttt.common.gamelogic.GameLogic;
-import org.mdevlamynck.qttt.common.gamelogic.GridSquare;
-import org.mdevlamynck.qttt.common.gamelogic.GridSquare.EPlayer;
-import org.mdevlamynck.qttt.common.gamelogic.Turn;
+import org.mdevlamynck.qttt.client.GameClient;
+import org.mdevlamynck.qttt.common.gamelogic.datastruct.GridSquare;
+import org.mdevlamynck.qttt.common.gamelogic.datastruct.GridSquare.EPlayer;
+import org.mdevlamynck.qttt.common.gamelogic.datastruct.Turn;
 
 public class MainPanel extends Panel {
 	
 	private JButton[][]		gridBtn			= null;
-	private GridSquare[][]	gridData		= null;
 	
-	private	GameLogic		gl				= null;
-	
-	private Turn			lastSelected	= new Turn();
-	private	int				squareSelected	= 0;
+	private GameClient		controller		= null;
 	
 	private	Panel			board			= null;
 	private	Panel			log				= null;
 	
 	private	JTextArea		logText			= new JTextArea();
-	
-	private NetworkHandler	network			= new NetworkHandler(this);
-	
-	private boolean			needTurn		= false;
 
-	public MainPanel()
+	public MainPanel(GameClient controller)
 	{
-		resetGame();	
-		updateRender();
-		
-		enableSquares(false);
-
-		network.start();
+		this.controller = controller;
 	}
 	
 	public void updateRender()
 	{
+		GridSquare[][]	gridData	= controller.getGrid();
+		
 		for(int col = 0; col < gridData.length; col++)
 		{
 			for(int row = 0; row < gridData[col].length; row++)
@@ -85,28 +71,10 @@ public class MainPanel extends Panel {
 		}
 	}
 	
-	public void selected(int col, int row)
-	{
-		if(squareSelected < 2)
-		{
-			synchronized (lastSelected) {
-				lastSelected.pos[squareSelected].col = col;
-				lastSelected.pos[squareSelected].row = row;
-				squareSelected++;
-				
-				if		(needTurn && squareSelected == 2)
-					lastSelected.notify();
-				else if	(!needTurn && squareSelected == 1)
-					lastSelected.notify();
-			}
-		}
-	}
-	
 	public void resetGame()
 	{
-		gl			= new GameLogic(null);
-		gridData	= gl.getGrid();
-		gridBtn		= new JButton[gridData.length][gridData[0].length];
+		GridSquare[][] gridData	= controller.getGrid();
+		gridBtn					= new JButton[gridData.length][gridData[0].length];
 		
 		removeAll();
 		setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
@@ -119,7 +87,7 @@ public class MainPanel extends Panel {
 			for(int row = 0; row < gridData[col].length; row++)
 			{
 				gridBtn[col][row] = new JButton();
-				gridBtn[col][row].addActionListener(new SquareListener(this, col, row));
+				gridBtn[col][row].addActionListener(new SquareListener(controller, col, row));
 				board.add(gridBtn[col][row]);
 			}
 		}
@@ -130,76 +98,6 @@ public class MainPanel extends Panel {
 		log.setLayout(new GridLayout(1, 1));
 		log.add(logText);
 		add(log);
-	}
-	
-	public Turn getTurn()
-	{
-		Turn turn = null;
-
-		synchronized (lastSelected) {
-			needTurn = true;
-			
-			enableSquares(true);
-			
-			while(squareSelected != 2) {
-				try {
-					lastSelected.wait();
-				} catch (InterruptedException e) {
-					e.printStackTrace();
-				}
-			}
-			squareSelected = 0;
-			turn = lastSelected;
-						
-			enableSquares(false);
-		}
-		
-		return turn;
-	}
-	
-	public int getChoice()
-	{
-		Turn	turn	= null;
-		int		choice	= -1;
-		
-		synchronized (lastSelected) {
-			needTurn = false;
-			
-			turn = lastSelected;
-			
-			enableOnly(turn);
-			
-			while(squareSelected != 1) {
-				try {
-					lastSelected.wait();
-				} catch (InterruptedException e) {
-					e.printStackTrace();
-				}
-			}
-			squareSelected = 0;
-			
-			if		(turn.pos[1].equals(lastSelected.pos[0]))
-				choice = 1;
-			else if	(turn.pos[0].equals(lastSelected.pos[0]))
-				choice = 0;
-			
-			enableSquares(false);
-		}
-		
-		return choice;
-	}
-	
-	public void addTurn(Turn t)
-	{
-		lastSelected = t;
-		gl.playTurn(t);
-		updateRender();
-	}
-	
-	public void addChoice(int choice)
-	{
-		gl.resolvCycle(choice);
-		updateRender();
 	}
 	
 	public void addToLog(String  text)
@@ -218,9 +116,10 @@ public class MainPanel extends Panel {
 	
 	public void enableSquares(boolean enable)
 	{
-		for(int col = 0; col < gridData.length; col++)
+		GridSquare[][] gridData	= controller.getGrid();
+		for(int col = 0; col < gridBtn.length; col++)
 		{
-			for(int row = 0; row < gridData[col].length; row++)
+			for(int row = 0; row < gridBtn[col].length; row++)
 			{
 				if(gridData[col][row].player != EPlayer.NotYetPlayed)
 					gridBtn[col][row].setEnabled(false);
@@ -232,9 +131,9 @@ public class MainPanel extends Panel {
 	
 	public void enableOnly(Turn t)
 	{
-		for(int col = 0; col < gridData.length; col++)
+		for(int col = 0; col < gridBtn.length; col++)
 		{
-			for(int row = 0; row < gridData[col].length; row++)
+			for(int row = 0; row < gridBtn[col].length; row++)
 			{
 				if( (col == t.pos[0].col && row == t.pos[0].row) ||
 					(col == t.pos[1].col && row == t.pos[1].row))

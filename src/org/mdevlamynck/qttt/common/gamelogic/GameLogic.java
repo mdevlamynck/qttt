@@ -3,7 +3,10 @@ package org.mdevlamynck.qttt.common.gamelogic;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.mdevlamynck.qttt.common.gamelogic.GridSquare.EPlayer;
+import org.mdevlamynck.qttt.common.gamelogic.datastruct.GameResult;
+import org.mdevlamynck.qttt.common.gamelogic.datastruct.GridSquare;
+import org.mdevlamynck.qttt.common.gamelogic.datastruct.Turn;
+import org.mdevlamynck.qttt.common.gamelogic.datastruct.GridSquare.EPlayer;
 
 public class GameLogic {
 	

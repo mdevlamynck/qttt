@@ -6,8 +6,8 @@ import java.util.Scanner;
 
 import org.mdevlamynck.qttt.common.messages.EClient;
 import org.mdevlamynck.qttt.common.messages.EServer;
-import org.mdevlamynck.qttt.server.Client;
 import org.mdevlamynck.qttt.server.GameServer;
+import org.mdevlamynck.qttt.server.datastruct.Client;
 
 public class ClientReaderHandler extends Thread {
 	

@@ -1,62 +1,154 @@
 package org.mdevlamynck.qttt.client;
 
-import java.io.BufferedReader;
-import java.io.InputStreamReader;
-import java.io.PrintWriter;
-import java.net.Socket;
-
 import javax.swing.JFrame;
 
 import org.mdevlamynck.qttt.client.gui.MainPanel;
-import org.mdevlamynck.qttt.common.messages.EClient;
-import org.mdevlamynck.qttt.common.messages.EServer;
+import org.mdevlamynck.qttt.client.network.NetworkHandler;
+import org.mdevlamynck.qttt.common.gamelogic.GameLogic;
+import org.mdevlamynck.qttt.common.gamelogic.datastruct.GridSquare;
+import org.mdevlamynck.qttt.common.gamelogic.datastruct.Turn;
 
 public class GameClient extends JFrame {
 
-	private static final long serialVersionUID = -5868967571057594004L;
+	private static final long	serialVersionUID	= -5868967571057594004L;
 
-	private MainPanel panel = new MainPanel();
+	private MainPanel 			view 				= new MainPanel(this);
+	
+	private	GameLogic			gl					= null;
+	
+	private Turn				lastSelected		= new Turn();
+	private	int					squareSelected		= 0;
+
+	private NetworkHandler		network				= new NetworkHandler(this);
+	
+	private boolean				needTurn			= false;
+	
+	private GridSquare[][]		grid				= null;
 	
 	public GameClient()
 	{
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setVisible(true);
 
-		add(panel);
+		add(view);
 		setSize(300, 150);
+
+		resetGame();	
+		view.updateRender();
+		
+		view.enableSquares(false);
+
+		network.start();
+	}
+
+	public void selected(int col, int row)
+	{
+		if(squareSelected < 2)
+		{
+			synchronized (lastSelected) {
+				lastSelected.pos[squareSelected].col = col;
+				lastSelected.pos[squareSelected].row = row;
+				squareSelected++;
+				
+				if		(needTurn && squareSelected == 2)
+					lastSelected.notify();
+				else if	(!needTurn && squareSelected == 1)
+					lastSelected.notify();
+			}
+		}
+	}
+
+	public Turn getTurn()
+	{
+		Turn turn = null;
+
+		synchronized (lastSelected) {
+			needTurn = true;
+			
+			view.enableSquares(true);
+			
+			while(squareSelected != 2) {
+				try {
+					lastSelected.wait();
+				} catch (InterruptedException e) {
+					e.printStackTrace();
+				}
+			}
+			squareSelected = 0;
+			turn = lastSelected;
+						
+			view.enableSquares(false);
+		}
+		
+		return turn;
 	}
 	
-	/*
-	public void testCommunication()
+	public int getChoice()
 	{
-		try
-		{
-			Socket			server	= new Socket("localhost", 42042);
-
-			BufferedReader	in		= new BufferedReader(new InputStreamReader(server.getInputStream()));
-			PrintWriter		out		= new PrintWriter(server.getOutputStream(), true);
+		Turn	turn	= null;
+		int		choice	= -1;
+		
+		synchronized (lastSelected) {
+			needTurn = false;
 			
-			out.println(EClient.CLIENT_CONNECTION);
-			if(in.readLine().equals(EServer.CLIENT_CONNECTED.toString()))
-				System.out.println("Connection Success");
-			else
-				System.out.println("Connection Failed");
+			turn = lastSelected;
 			
-			Thread.sleep(5000);
+			view.enableOnly(turn);
 			
-			out.println(EClient.SERVER_STOP);
-			if(in.readLine().equals(EServer.SERVER_STOPPING.toString()))
-				System.out.println("Server Stop Success");
-			else
-				System.out.println("Server Stop Failed");
+			while(squareSelected != 1) {
+				try {
+					lastSelected.wait();
+				} catch (InterruptedException e) {
+					e.printStackTrace();
+				}
+			}
+			squareSelected = 0;
 			
-			server.close();
+			if		(turn.pos[1].equals(lastSelected.pos[0]))
+				choice = 1;
+			else if	(turn.pos[0].equals(lastSelected.pos[0]))
+				choice = 0;
+			
+			view.enableSquares(false);
 		}
-		catch(Exception e)
-		{
-			System.err.println(e.getMessage());
-		}
+		
+		return choice;
 	}
-	*/
+	
+	public void addTurn(Turn t)
+	{
+		lastSelected = t;
+		gl.playTurn(t);
+		view.updateRender();
+	}
+	
+	public void addChoice(int choice)
+	{
+		gl.resolvCycle(choice);
+		view.updateRender();
+	}
+	
+	public void resetGame()
+	{
+		gl		= new GameLogic(null);
+		grid	= gl.getGrid();
+		
+		view.resetGame();
+	}
+	
+	public void addToLog(String text)
+	{
+		view.addToLog(text);
+	}
+	
+	public void clearLog()
+	{
+		view.clearLog();
+	}
+	
+	public GridSquare[][] getGrid()
+	{
+		return grid;
+	}
 
 }

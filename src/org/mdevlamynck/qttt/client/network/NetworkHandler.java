@@ -4,22 +4,23 @@ import java.io.PrintWriter;
 import java.net.Socket;
 import java.util.Scanner;
 
+import org.mdevlamynck.qttt.client.GameClient;
 import org.mdevlamynck.qttt.client.gui.MainPanel;
-import org.mdevlamynck.qttt.common.gamelogic.Turn;
-import org.mdevlamynck.qttt.common.gamelogic.GridSquare.EPlayer;
+import org.mdevlamynck.qttt.common.gamelogic.datastruct.GridSquare.EPlayer;
+import org.mdevlamynck.qttt.common.gamelogic.datastruct.Turn;
 import org.mdevlamynck.qttt.common.messages.EServer;
 
 public class NetworkHandler extends Thread {
 	
-	private MainPanel	win		= null;
+	private GameClient	client	= null;
 	private Socket		server	= null;
 	private	Scanner		in		= null;
 	private	PrintWriter	out		= null;
 	private EPlayer		player	= EPlayer.NotYetPlayed;
 	
-	public NetworkHandler(MainPanel win)
+	public NetworkHandler(GameClient win)
 	{
-		this.win = win;
+		this.client = win;
 	}
 	
 	@Override
@@ -41,16 +42,16 @@ public class NetworkHandler extends Thread {
 					player = Integer.parseInt(readLine()) == 1 ? EPlayer.P1 : EPlayer.P2;
 				
 				else if	( line.equals(EServer.GAME_REQUEST_TURN.toString())		)
-					writeLine		( win.getTurn().toString()				);
+					writeLine		( client.getTurn().toString()				);
 				
 				else if	( line.equals(EServer.GAME_REQUEST_CHOICE.toString())	)
-					writeLine		( ((Integer)win.getChoice()).toString()	);
+					writeLine		( ((Integer)client.getChoice()).toString()	);
 				
 				else if	( line.equals(EServer.GAME_OTHER_TURN.toString())		)
-					win.addTurn		( new Turn().fromString(readLine()) 	);
+					client.addTurn		( new Turn().fromString(readLine()) 	);
 				
 				else if	( line.equals(EServer.GAME_OTHER_CHOICE.toString())		)
-					win.addChoice	( Integer.parseInt(readLine()) 			);
+					client.addChoice	( Integer.parseInt(readLine()) 			);
 				
 			} while( !line.equals(EServer.GAME_FINISHED.toString())	);
 			
@@ -65,14 +66,14 @@ public class NetworkHandler extends Thread {
 	private String readLine()
 	{
 		String line = in.nextLine();
-		win.addToLog("< " + line);
+		client.addToLog("< " + line);
 		return line;
 	}
 	
 	private void writeLine(String line)
 	{
 		out.println(line);
-		win.addToLog("> " + line);
+		client.addToLog("> " + line);
 	}
 
 }

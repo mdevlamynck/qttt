@@ -4,11 +4,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.mdevlamynck.qttt.common.gamelogic.GameLogic;
-import org.mdevlamynck.qttt.common.gamelogic.GameResult;
 import org.mdevlamynck.qttt.common.gamelogic.IHMBackend;
-import org.mdevlamynck.qttt.common.gamelogic.Turn;
+import org.mdevlamynck.qttt.common.gamelogic.datastruct.GameResult;
+import org.mdevlamynck.qttt.common.gamelogic.datastruct.Turn;
 import org.mdevlamynck.qttt.common.messages.EServer;
-import org.mdevlamynck.qttt.server.Client;
+import org.mdevlamynck.qttt.server.datastruct.Client;
 
 public class GameSessionHandler extends Thread implements IHMBackend {
 	
