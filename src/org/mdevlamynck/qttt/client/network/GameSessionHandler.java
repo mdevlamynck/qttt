@@ -1,6 +1,6 @@
 package org.mdevlamynck.qttt.client.network;
 
-import org.mdevlamynck.qttt.client.GameClient;
+import org.mdevlamynck.qttt.client.controllers.GameClient;
 import org.mdevlamynck.qttt.common.gamelogic.datastruct.Turn;
 import org.mdevlamynck.qttt.common.gamelogic.datastruct.GridSquare.EPlayer;
 import org.mdevlamynck.qttt.common.network.EMessages;
@@ -22,42 +22,45 @@ public class GameSessionHandler extends Thread {
 	public void run()
 	{
 		String line = null;
-		do
+		
+		while(!controller.getQuit())
 		{
-			line = readLine();
+			try
+			{
+				line = readLine();
+				
+				if		( line.equals(EMessages.GAME_START.toString())			)
+					player = Integer.parseInt(readLine()) == 1 ? EPlayer.P1 : EPlayer.P2;
 			
-			if		( line.equals(EMessages.GAME_START.toString())			)
-				player = Integer.parseInt(readLine()) == 1 ? EPlayer.P1 : EPlayer.P2;
-		
-			else if	( line.equals(EMessages.GAME_REQUEST_TURN.toString())		)
-				writeLine	( controller.getTurn().toString()				);
-			
-			else if	( line.equals(EMessages.GAME_REQUEST_CHOICE.toString())	)
-				writeLine	( ((Integer)controller.getChoice()).toString()	);
-			
-			else if	( line.equals(EMessages.GAME_OTHER_TURN.toString())		)
-				controller.addTurn		( new Turn().fromString(readLine()) );
-			
-			else if	( line.equals(EMessages.GAME_OTHER_CHOICE.toString())		)
-				controller.addChoice	( Integer.parseInt(readLine()) 		);
-			
-		} while( !line.equals(EMessages.GAME_FINISHED.toString())	);
-		
-		readLine();
+				else if	( line.equals(EMessages.GAME_REQUEST_TURN.toString())		)
+					writeLine	( controller.getTurn().toString()				);
+				
+				else if	( line.equals(EMessages.GAME_REQUEST_CHOICE.toString())	)
+					writeLine	( ((Integer)controller.getChoice()).toString()	);
+				
+				else if	( line.equals(EMessages.GAME_OTHER_TURN.toString())		)
+					controller.addTurn		( new Turn().fromString(readLine()) );
+				
+				else if	( line.equals(EMessages.GAME_OTHER_CHOICE.toString())		)
+					controller.addChoice	( Integer.parseInt(readLine()) 		);
+				else if	( line.equals(EMessages.GAME_FINISHED.toString())		)
+				{
+					readLine();
+					controller.quit();
+				}
+			}
+			catch(InterruptedException e)
+			{
+			}
+		}
 		
 		controller.quit();
 	}
 
-	private String readLine()
+	private String readLine() throws InterruptedException
 	{
 		String line = "";
-		try
-		{
-			line = server.game.pop();
-		}
-		catch(InterruptedException e)
-		{
-		}
+		line = server.game.pop();
 
 		controller.addToLog(line, true);
 		return line;

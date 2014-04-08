@@ -2,52 +2,78 @@ package org.mdevlamynck.qttt.client.network;
 
 import java.io.PrintWriter;
 import java.net.Socket;
+import java.util.NoSuchElementException;
 import java.util.Scanner;
 
-import org.mdevlamynck.qttt.client.GameClient;
-import org.mdevlamynck.qttt.client.gui.MainPanel;
-import org.mdevlamynck.qttt.common.gamelogic.datastruct.GridSquare.EPlayer;
-import org.mdevlamynck.qttt.common.gamelogic.datastruct.Turn;
+import org.mdevlamynck.qttt.client.MainFrame;
 import org.mdevlamynck.qttt.common.network.EMessages;
 import org.mdevlamynck.qttt.common.network.datastruct.Client;
 
 public class NetworkInputHandler extends Thread {
 	
-	private GameClient	controller	= null;
-	private	Client		server		= null;
+	private MainFrame	controller	= null;
+	private	Client		server		= new Client();
+	private String		address		= null;
+	private int			port		= -1;
 	
-	public NetworkInputHandler(GameClient win, Client server)
+	public NetworkInputHandler(MainFrame win)
 	{
 		this.controller	= win;
-		this.server		= server;
-
+	}
+	
+	public boolean setServer(String addressServer, int portServer)
+	{
+		this.address	= addressServer;
+		this.port		= portServer;
+		
 		try
 		{
-			server.socket	= new Socket("localhost", 42042);
+			server.socket	= new Socket(address, port);
 			server.in		= new Scanner(server.socket.getInputStream());
 			server.out		= new PrintWriter(server.socket.getOutputStream(), true);			
 		}
 		catch(Exception e)
 		{
-			System.err.println(e.getMessage());
+			return false;
 		}
+		
+		return true;
 	}
 	
 	@Override
 	public void run()
 	{
+		if(controller == null || address == null || port == -1)
+		{
+			if(controller != null)
+				controller.quit();
+			
+			return;
+		}
+
 		String line;
 		
 		while(!controller.getQuit())
 		{
-			line = server.in.nextLine();
-			
-			if		(line.startsWith(EMessages.GAME_PREFIX.toString()))
-				server.game.push(line.substring(EMessages.GAME_PREFIX.toString().length()));
-
-			else if	(line.startsWith(EMessages.CHAT_PREFIX.toString()))
-				server.chat.push(line.substring(EMessages.CHAT_PREFIX.toString().length()));
+			try
+			{
+				line = server.in.nextLine();
+				
+				if		(line.startsWith(EMessages.GAME_PREFIX.toString()))
+					server.game.push(line.substring(EMessages.GAME_PREFIX.toString().length()));
+	
+				else if	(line.startsWith(EMessages.CHAT_PREFIX.toString()))
+					server.chat.push(line.substring(EMessages.CHAT_PREFIX.toString().length()));
+			}
+			catch(NoSuchElementException e)
+			{
+				controller.lostConnection();
+			}
 		}
+	}
+
+	public Client getServer() {
+		return server;
 	}
 
 }

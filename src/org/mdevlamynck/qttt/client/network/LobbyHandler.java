@@ -1,15 +1,15 @@
 package org.mdevlamynck.qttt.client.network;
 
-import org.mdevlamynck.qttt.client.controllers.GameClient;
+import org.mdevlamynck.qttt.client.controllers.LobbyClient;
 import org.mdevlamynck.qttt.common.network.EMessages;
 import org.mdevlamynck.qttt.common.network.datastruct.Client;
 
-public class ChatHandler extends Thread {
+public class LobbyHandler extends Thread {
 	
-	private GameClient	controller	= null;
+	private LobbyClient	controller	= null;
 	private	Client		server		= null;
 	
-	public ChatHandler(GameClient controller, Client server)
+	public LobbyHandler(LobbyClient controller, Client server)
 	{
 		this.controller	= controller;
 		this.server		= server;
@@ -18,21 +18,25 @@ public class ChatHandler extends Thread {
 	@Override
 	public void run()
 	{
+		String line;
+		
 		while(!controller.getQuit())
 		{
 			try
 			{
-				controller.addToChat(server.chat.pop(), true);
+				line = server.game.pop();
+				if(line.contains(EMessages.GAME_START.toString()))
+				{
+					controller.toGame();
+					break;	
+				}
 			}
 			catch(InterruptedException e)
 			{
+				controller.toConnection();
+				break;
 			}
 		}
-			
-	}
-
-	public void sendChatMessg(String sendText) {
-		server.out.println(EMessages.CHAT_PREFIX.toString() + sendText);
 	}
 
 }

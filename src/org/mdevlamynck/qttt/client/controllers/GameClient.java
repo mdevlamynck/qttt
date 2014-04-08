@@ -1,54 +1,55 @@
-package org.mdevlamynck.qttt.client;
 
-import javax.swing.JFrame;
+package org.mdevlamynck.qttt.client.controllers;
 
-import org.mdevlamynck.qttt.client.gui.MainPanel;
+import java.awt.Panel;
+
+import org.mdevlamynck.qttt.client.MainFrame;
 import org.mdevlamynck.qttt.client.network.ChatHandler;
 import org.mdevlamynck.qttt.client.network.GameSessionHandler;
 import org.mdevlamynck.qttt.client.network.NetworkInputHandler;
+import org.mdevlamynck.qttt.client.views.GamePanel;
 import org.mdevlamynck.qttt.common.gamelogic.GameLogic;
 import org.mdevlamynck.qttt.common.gamelogic.datastruct.GridSquare;
 import org.mdevlamynck.qttt.common.gamelogic.datastruct.Turn;
-import org.mdevlamynck.qttt.common.network.datastruct.Client;
 
-public class GameClient extends JFrame {
-
-	private static final long	serialVersionUID	= -5868967571057594004L;
-
-	private MainPanel 			view 				= new MainPanel(this);
+public class GameClient extends BasicController {
+	
+	private MainFrame			parent				= null;
+	
+	private GamePanel 			view 				= new GamePanel(this);
 	
 	private	GameLogic			gl					= null;
 	
 	private Turn				lastSelected		= new Turn();
 	private	int					squareSelected		= 0;
-	
-	private Client				server				= new Client();
 
-	private NetworkInputHandler	network				= new NetworkInputHandler(this, server);
-	private GameSessionHandler	game				= new GameSessionHandler(this, server);
-	private ChatHandler			chat				= new ChatHandler(this, server);
+	private NetworkInputHandler	network				= null;
+	private GameSessionHandler	game				= null;
+	private ChatHandler			chat				= null;
 	
 	private boolean				needTurn			= false;
 	
 	private GridSquare[][]		grid				= null;
 	
-	private	boolean				quit				= false;
-	
-	public GameClient()
+	public GameClient(MainFrame parent, NetworkInputHandler network)
 	{
-		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		setVisible(true);
+		super(parent);
 
-		add(view);
-		setSize(300, 150);
+		this.parent		= parent;
+		this.network	= network;
+		
+		this.game		= new GameSessionHandler(this, network.getServer());
+		this.chat		= new ChatHandler(this, network.getServer());
 
 		resetGame();
 		view.init();
 		view.updateRender();
 		
 		view.enableSquares(false);
-
-		network.start();
+	}
+	
+	public void start()
+	{
 		game.start();
 		chat.start();
 	}
@@ -90,7 +91,7 @@ public class GameClient extends JFrame {
 				try {
 					lastSelected.wait();
 				} catch (InterruptedException e) {
-					e.printStackTrace();
+					return null;
 				}
 			}
 			squareSelected = 0;
@@ -118,7 +119,7 @@ public class GameClient extends JFrame {
 				try {
 					lastSelected.wait();
 				} catch (InterruptedException e) {
-					e.printStackTrace();
+					return -1;
 				}
 			}
 			squareSelected = 0;
@@ -177,14 +178,19 @@ public class GameClient extends JFrame {
 	{
 		return grid;
 	}
-	
-	public boolean getQuit()
-	{
-		return quit;
-	}
 
-	public void quit() {
-		quit = true;
+	public void quit()
+	{
+		network.interrupt();
+		game.interrupt();
+		chat.interrupt();
+
+		parent.chooseServer();
+	}
+	
+	public Panel getPanel()
+	{
+		return view;
 	}
 
 }

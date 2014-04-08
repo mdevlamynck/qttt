@@ -1,9 +1,9 @@
-package org.mdevlamynck.qttt.client.gui;
+package org.mdevlamynck.qttt.client.controllers.listeners;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
-import org.mdevlamynck.qttt.client.GameClient;
+import org.mdevlamynck.qttt.client.controllers.GameClient;
 
 public class SquareListener implements ActionListener {
 	

@@ -1,4 +1,4 @@
-package org.mdevlamynck.qttt.client.gui;
+package org.mdevlamynck.qttt.client.views;
 
 import java.awt.GridLayout;
 import java.awt.Panel;
@@ -9,12 +9,14 @@ import javax.swing.JTabbedPane;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
 
-import org.mdevlamynck.qttt.client.GameClient;
+import org.mdevlamynck.qttt.client.controllers.GameClient;
+import org.mdevlamynck.qttt.client.controllers.listeners.ChatListener;
+import org.mdevlamynck.qttt.client.controllers.listeners.SquareListener;
 import org.mdevlamynck.qttt.common.gamelogic.datastruct.GridSquare;
 import org.mdevlamynck.qttt.common.gamelogic.datastruct.GridSquare.EPlayer;
 import org.mdevlamynck.qttt.common.gamelogic.datastruct.Turn;
 
-public class MainPanel extends Panel {
+public class GamePanel extends Panel {
 	
 	private JButton[][]		gridBtn			= null;
 	
@@ -31,7 +33,7 @@ public class MainPanel extends Panel {
 	private	JTextArea		chatText		= new JTextArea();
 	private JTextField		sendText		= new JTextField();
 
-	public MainPanel(GameClient controller)
+	public GamePanel(GameClient controller)
 	{
 		this.controller = controller;
 		
