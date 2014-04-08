@@ -6,9 +6,8 @@ import org.mdevlamynck.qttt.common.gamelogic.GameLogic;
 import org.mdevlamynck.qttt.common.gamelogic.IHMBackend;
 import org.mdevlamynck.qttt.common.gamelogic.datastruct.GameResult;
 import org.mdevlamynck.qttt.common.gamelogic.datastruct.GridSquare;
-import org.mdevlamynck.qttt.common.gamelogic.datastruct.Turn;
 import org.mdevlamynck.qttt.common.gamelogic.datastruct.GridSquare.EPlayer;
-import org.mdevlamynck.qttt.common.gamelogic.datastruct.Turn.Pos;
+import org.mdevlamynck.qttt.common.gamelogic.datastruct.Turn;
 
 public class TestConsoleClient implements IHMBackend{
 	
@@ -78,7 +77,7 @@ public class TestConsoleClient implements IHMBackend{
 		{
 			for(int row = 0; row < grid[col].length; row++)
 			{
-				if		(grid[row][col].player == EPlayer.NotYetPlayed)
+				if		(grid[row][col].player == EPlayer.None)
 					System.out.print("-");
 				else if	(grid[row][col].player == EPlayer.P1)
 					System.out.print("o");
@@ -92,7 +91,7 @@ public class TestConsoleClient implements IHMBackend{
 				
 				for(Integer it : grid[row][col].undefinedTurns.keySet())
 				{
-					if		(grid[row][col].undefinedTurns.get(it) == EPlayer.NotYetPlayed)
+					if		(grid[row][col].undefinedTurns.get(it) == EPlayer.None)
 						System.out.print("-");
 					else if	(grid[row][col].undefinedTurns.get(it) == EPlayer.P1)
 						System.out.print("o");

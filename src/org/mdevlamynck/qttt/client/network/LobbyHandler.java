@@ -1,18 +1,23 @@
 package org.mdevlamynck.qttt.client.network;
 
 import org.mdevlamynck.qttt.client.controllers.LobbyClient;
-import org.mdevlamynck.qttt.common.network.EMessages;
-import org.mdevlamynck.qttt.common.network.datastruct.Client;
+import org.mdevlamynck.qttt.client.network.datastructs.Server;
+import org.mdevlamynck.qttt.common.network.BasicHandler;
+import org.mdevlamynck.qttt.common.network.datastruct.OtherEndMessage;
+import org.mdevlamynck.qttt.common.network.messages.EGame;
+import org.mdevlamynck.qttt.common.network.messages.EPrefixes;
 
-public class LobbyHandler extends Thread {
+public class LobbyHandler extends BasicHandler {
 	
-	private LobbyClient	controller	= null;
-	private	Client		server		= null;
+	private LobbyClient				controller	= null;
+	private	Server					server		= null;
 	
-	public LobbyHandler(LobbyClient controller, Client server)
+	public LobbyHandler(LobbyClient controller, Server server)
 	{
-		this.controller	= controller;
-		this.server		= server;
+		handlerPrefix			= EPrefixes.LOBBY;
+		
+		this.controller			= controller;
+		this.server				= server;
 	}
 	
 	@Override
@@ -24,8 +29,9 @@ public class LobbyHandler extends Thread {
 		{
 			try
 			{
-				line = server.game.pop();
-				if(line.contains(EMessages.GAME_START.toString()))
+				line = server.lobby.pop();
+
+				if(line.contains(EGame.START.toString()))
 				{
 					controller.toGame();
 					break;	
@@ -37,6 +43,11 @@ public class LobbyHandler extends Thread {
 				break;
 			}
 		}
+	}
+
+	@Override
+	public void addMessage(OtherEndMessage mess) {
+		server.lobby.push(mess.message);
 	}
 
 }

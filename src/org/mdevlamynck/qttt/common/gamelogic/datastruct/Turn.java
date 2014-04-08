@@ -1,6 +1,5 @@
 package org.mdevlamynck.qttt.common.gamelogic.datastruct;
 
-import java.util.Arrays;
 import java.util.Scanner;
 
 public class Turn {
@@ -69,6 +68,8 @@ public class Turn {
 		pos[0].row = scan.nextInt();
 		pos[1].col = scan.nextInt();
 		pos[1].row = scan.nextInt();
+		
+		scan.close();
 		
 		return this;
 	}

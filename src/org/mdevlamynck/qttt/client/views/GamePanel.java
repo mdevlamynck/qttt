@@ -17,7 +17,9 @@ import org.mdevlamynck.qttt.common.gamelogic.datastruct.GridSquare.EPlayer;
 import org.mdevlamynck.qttt.common.gamelogic.datastruct.Turn;
 
 public class GamePanel extends Panel {
-	
+
+	private static final long serialVersionUID = 3911793017047934501L;
+
 	private JButton[][]		gridBtn			= null;
 	
 	private GameClient		controller		= null;
@@ -84,7 +86,7 @@ public class GamePanel extends Panel {
 			for(int row = 0; row < gridData[col].length; row++)
 			{
 				String text = "";
-				if		(gridData[col][row].player == EPlayer.NotYetPlayed)
+				if		(gridData[col][row].player == EPlayer.None)
 					text += "-";
 				else if	(gridData[col][row].player == EPlayer.P1)
 					text += "o";
@@ -100,7 +102,7 @@ public class GamePanel extends Panel {
 					
 					for(Integer it : gridData[col][row].undefinedTurns.keySet())
 					{
-						if		(gridData[col][row].undefinedTurns.get(it) == EPlayer.NotYetPlayed)
+						if		(gridData[col][row].undefinedTurns.get(it) == EPlayer.None)
 							text += "-";
 						else if	(gridData[col][row].undefinedTurns.get(it) == EPlayer.P1)
 							text += "o";
@@ -155,7 +157,7 @@ public class GamePanel extends Panel {
 		{
 			for(int row = 0; row < gridBtn[col].length; row++)
 			{
-				if(gridData[col][row].player != EPlayer.NotYetPlayed)
+				if(gridData[col][row].player != EPlayer.None)
 					gridBtn[col][row].setEnabled(false);
 				else
 					gridBtn[col][row].setEnabled(enable);

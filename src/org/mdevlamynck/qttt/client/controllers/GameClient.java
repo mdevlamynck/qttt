@@ -10,6 +10,7 @@ import org.mdevlamynck.qttt.client.network.NetworkInputHandler;
 import org.mdevlamynck.qttt.client.views.GamePanel;
 import org.mdevlamynck.qttt.common.gamelogic.GameLogic;
 import org.mdevlamynck.qttt.common.gamelogic.datastruct.GridSquare;
+import org.mdevlamynck.qttt.common.gamelogic.datastruct.GridSquare.EPlayer;
 import org.mdevlamynck.qttt.common.gamelogic.datastruct.Turn;
 
 public class GameClient extends BasicController {
@@ -28,6 +29,8 @@ public class GameClient extends BasicController {
 	private boolean				needTurn			= false;
 	
 	private GridSquare[][]		grid				= null;
+	
+	private EPlayer				player				= EPlayer.None;
 	
 	public GameClient(MainFrame parent)
 	{
@@ -186,6 +189,11 @@ public class GameClient extends BasicController {
 	public Panel getPanel()
 	{
 		return view;
+	}
+
+	public void setPlayer(EPlayer player)
+	{
+		this.player	= player;
 	}
 
 }

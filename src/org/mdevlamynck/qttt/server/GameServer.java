@@ -1,27 +1,19 @@
 package org.mdevlamynck.qttt.server;
 
-import java.io.PrintWriter;
 import java.net.ServerSocket;
-import java.net.Socket;
-import java.util.ArrayList;
-import java.util.List;
 
-import org.mdevlamynck.qttt.common.network.EMessages;
-import org.mdevlamynck.qttt.common.network.datastruct.Client;
-import org.mdevlamynck.qttt.server.handlers.ClientReaderHandler;
-import org.mdevlamynck.qttt.server.handlers.GameSessionHandler;
+import org.mdevlamynck.qttt.common.network.datastruct.OtherEndMessage;
+import org.mdevlamynck.qttt.common.network.messages.ELobby;
+import org.mdevlamynck.qttt.server.datastructs.Client;
+import org.mdevlamynck.qttt.server.handlers.LobbyHandler;
+import org.mdevlamynck.qttt.server.handlers.NetworkInputHandler;
 
 public class GameServer {
 	
 	private ServerSocket				ssock			= null;
 	private boolean						quit			= false;
-
-	private	List<Client>				clients			= new ArrayList<Client>();
-	private	List<GameSessionHandler>	sessions		= new ArrayList<GameSessionHandler>();
 	
-	private	Client						waitingClient	= null;
-	
-	private Object						clientsLock		= new Object();
+	private LobbyHandler				lobbyHandler	= new LobbyHandler();
 	
 	public GameServer()
 	{
@@ -42,6 +34,7 @@ public class GameServer {
 		try
 		{
 			ssock	= new ServerSocket(42042);
+			lobbyHandler.start();
 		}
 		catch(Exception e)
 		{
@@ -71,7 +64,7 @@ public class GameServer {
 			while(!quit)
 			{
 				System.out.println("Server Listening ...");
-				new ClientReaderHandler(this, ssock.accept()).start();
+				new NetworkInputHandler(this, ssock.accept()).start();
 			}
 		}
 		catch(Exception e)
@@ -82,62 +75,17 @@ public class GameServer {
 	
 	public void quit()
 	{
-		if(quit)
-			return;
-		
-		quit = true;
-		
-		try
-		{
-			Socket			server	= new Socket("localhost", 42042);
-			PrintWriter		out		= new PrintWriter(server.getOutputStream(), true);
-			
-			out.println(EMessages.EMPTY_MESSAGE);
-		}
-		catch (Exception e)
-		{
-			System.err.println(e.getMessage());
-		}
+		lobbyHandler.interrupt();
 	}
 	
 	public void addClient(Client client)
 	{
-		synchronized (clientsLock)
-		{
-			clients.add(client);
-			
-			if(waitingClient == null)
-				waitingClient = client;
-			else
-			{
-				GameSessionHandler g	= new GameSessionHandler(waitingClient, client);
-				waitingClient			= null;
-				
-				sessions.add(g);
-				g.start();
-			}
-		}
+		lobbyHandler.addMessage(new OtherEndMessage(client, ELobby.ADD_CLIENT.toString()));
 	}
 	
 	public void removeClient(Client client)
 	{
-		synchronized (clientsLock)
-		{
-			if(clients.remove(client))
-			{
-				client.readerHandler.interrupt();
-				client.gameHandler.interrupt();
-
-				try
-				{
-					client.socket.close();
-				}
-				catch(Exception e)
-				{
-					System.err.println(e.getMessage());
-				}
-			}
-		}
+		lobbyHandler.addMessage(new OtherEndMessage(client, ELobby.REMOVE_CLIENT.toString()));
 	}
 	
 	public boolean getQuit()

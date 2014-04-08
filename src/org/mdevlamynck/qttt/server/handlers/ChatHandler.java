@@ -1,19 +1,26 @@
 package org.mdevlamynck.qttt.server.handlers;
 
-import org.mdevlamynck.qttt.common.network.EMessages;
-import org.mdevlamynck.qttt.common.network.datastruct.Client;
+import org.mdevlamynck.qttt.common.network.BasicHandler;
+import org.mdevlamynck.qttt.common.network.ConcurrentQueue;
+import org.mdevlamynck.qttt.common.network.datastruct.OtherEndMessage;
+import org.mdevlamynck.qttt.common.network.messages.EPrefixes;
+import org.mdevlamynck.qttt.server.datastructs.Client;
 
-public class ChatHandler extends Thread {
+public class ChatHandler extends BasicHandler {
+
+	private Client							p1			= null;
+	private Client							p2			= null;
+	private	ConcurrentQueue<OtherEndMessage>	messages	= new ConcurrentQueue<OtherEndMessage>();
 	
-	private GameSessionHandler	game	= null;
-	private Client				p1		= null;
-	private Client				p2		= null;
-	
-	public ChatHandler(GameSessionHandler game, Client p1, Client p2)
+	public ChatHandler(Client p1, Client p2)
 	{
-		this.game	= game;
+		handlerPrefix	= EPrefixes.CHAT;
+
 		this.p1		= p1;
 		this.p2		= p2;
+		
+		p1.gameChatHandler	= this;
+		p2.gameChatHandler	= this;
 	}
 	
 	@Override
@@ -23,8 +30,12 @@ public class ChatHandler extends Thread {
 		{
 			try
 			{
-				String line = p1.chat.pop();
-				writeLine(p2, line);
+				OtherEndMessage mess = messages.pop();
+				
+				if		(mess.client.equals(p1))
+					writeLine(p2, mess.message);
+				else if	(mess.client.equals(p2))
+					writeLine(p1, mess.message);
 			}
 			catch(InterruptedException e)
 			{
@@ -32,10 +43,11 @@ public class ChatHandler extends Thread {
 			}
 		}
 	}
-
-	private void writeLine(Client client, String line)
+	
+	@Override
+	public void addMessage(OtherEndMessage mess)
 	{
-		client.out.println(EMessages.CHAT_PREFIX.toString() + line);
+		messages.push(mess);
 	}
 
 }

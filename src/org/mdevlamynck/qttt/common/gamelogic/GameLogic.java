@@ -171,7 +171,7 @@ public class GameLogic {
 		if(!isValidCoordinate(column, row))
 			return false;
 		
-		return (grid[column][row].player == EPlayer.NotYetPlayed);
+		return (grid[column][row].player == EPlayer.None);
 	}
 	
 	private boolean isValidCoordinate(int column, int row)
@@ -216,7 +216,7 @@ public class GameLogic {
 		
 		boolean areAllTheSame	= true;
 		int		oldestSquare	= -1;
-		EPlayer	player			= EPlayer.NotYetPlayed;
+		EPlayer	player			= EPlayer.None;
 
 		for(int j = 0; j < SIZE; j++)
 		{
@@ -249,7 +249,7 @@ public class GameLogic {
 				row2 = j+1;
 			}
 			if( (col2 >= 0 && col2 < SIZE && row2 >= 0 && row2 < SIZE) && (
-				grid[col1][row1].player == EPlayer.NotYetPlayed ||
+				grid[col1][row1].player == EPlayer.None ||
 				grid[col1][row1].player != grid[col2][row2].player
 			))
 			{
@@ -282,7 +282,7 @@ public class GameLogic {
 		{
 			for(int row = 0; row < grid[col].length; row++)
 			{
-				if(grid[col][row].player == EPlayer.NotYetPlayed)
+				if(grid[col][row].player == EPlayer.None)
 					isFull = false;
 					
 			}
@@ -294,7 +294,7 @@ public class GameLogic {
 	private void processScore()
 	{
 		int		youngest	= Integer.MAX_VALUE;
-		EPlayer	player		= EPlayer.NotYetPlayed;
+		EPlayer	player		= EPlayer.None;
 		for(Integer oldest : gr.oldestsP1)
 		{
 			if(oldest < youngest)

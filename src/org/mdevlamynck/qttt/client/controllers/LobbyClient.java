@@ -36,6 +36,8 @@ public class LobbyClient extends BasicController {
 	{
 		network.interrupt();
 		lobby.interrupt();
+		
+		parent.lobbyClient();
 	}
 	
 	public void toConnection() {

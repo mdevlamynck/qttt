@@ -10,11 +10,11 @@ public class GridSquare {
 		P1,
 		P2,
 		
-		NotYetPlayed
+		None
 	}
 	
 	public Integer	turnNumber		= -1;
-	public EPlayer	player			= EPlayer.NotYetPlayed;
+	public EPlayer	player			= EPlayer.None;
 	
 	public Hashtable<
 		Integer,

@@ -13,7 +13,7 @@ import org.mdevlamynck.qttt.client.controllers.listeners.QuitChooseListener;
 
 public class ChoosePanel extends Panel {
 
-	private ChooseServer	controller	= null;
+	private static final long serialVersionUID = -2583801359782860518L;
 	
 	private JTextField		serverField	= new JTextField("localhost");
 	private JTextField		portField	= new JTextField("42042");
@@ -22,8 +22,6 @@ public class ChoosePanel extends Panel {
 	
 	public ChoosePanel(ChooseServer controller)
 	{
-		this.controller = controller;
-
 		setLayout(new GridLayout(3, 2, 5, 5));
 		
 		add(new JLabel("Server : "));

@@ -6,19 +6,20 @@ import java.util.NoSuchElementException;
 import java.util.Scanner;
 
 import org.mdevlamynck.qttt.client.MainFrame;
-import org.mdevlamynck.qttt.common.network.EMessages;
-import org.mdevlamynck.qttt.common.network.datastruct.Client;
+import org.mdevlamynck.qttt.client.network.datastructs.Server;
+import org.mdevlamynck.qttt.common.network.messages.EPrefixes;
+import org.mdevlamynck.qttt.common.network.messages.EServer;
 
 public class NetworkInputHandler extends Thread {
 	
-	private MainFrame	controller	= null;
-	private	Client		server		= new Client();
-	private String		address		= null;
-	private int			port		= -1;
+	private MainFrame		controller	= null;
+	private	Server			server		= new Server();
+	private String			address		= null;
+	private int				port		= -1;
 	
 	public NetworkInputHandler(MainFrame win)
 	{
-		this.controller	= win;
+		this.controller			= win;
 	}
 	
 	public boolean setServer(String addressServer, int portServer)
@@ -58,15 +59,19 @@ public class NetworkInputHandler extends Thread {
 			try
 			{
 				line = server.in.nextLine();
+				System.out.println(line);
 
-				if		(line.equals(EMessages.SERVER_STOPPING.toString()))
+				if		(line.equals(EServer.STOPPING.toString()))
 					break;
-				
-				else if	(line.startsWith(EMessages.GAME_PREFIX.toString()))
-					server.game.push(line.substring(EMessages.GAME_PREFIX.toString().length()));
+
+				else if	(line.startsWith(EPrefixes.GAME.toString()))
+					server.game.push(line.substring(EPrefixes.GAME.toString().length()));
 	
-				else if	(line.startsWith(EMessages.CHAT_PREFIX.toString()))
-					server.chat.push(line.substring(EMessages.CHAT_PREFIX.toString().length()));
+				else if	(line.startsWith(EPrefixes.CHAT.toString()))
+					server.gameChat.push(line.substring(EPrefixes.CHAT.toString().length()));
+
+				else if	(line.startsWith(EPrefixes.LOBBY.toString()))
+					server.lobby.push(line.substring(EPrefixes.LOBBY.toString().length()));
 			}
 			catch(NoSuchElementException e)
 			{
@@ -77,7 +82,7 @@ public class NetworkInputHandler extends Thread {
 		controller.lostConnection();
 	}
 
-	public Client getServer() {
+	public Server getServer() {
 		return server;
 	}
 

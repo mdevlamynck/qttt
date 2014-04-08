@@ -22,6 +22,8 @@ public class GameResult {
 		
 		scoreP1	= scan.nextInt();
 		scoreP2	= scan.nextInt();
+		
+		scan.close();
 	}
 
 }

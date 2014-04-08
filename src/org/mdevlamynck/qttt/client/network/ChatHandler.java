@@ -1,18 +1,23 @@
 package org.mdevlamynck.qttt.client.network;
 
 import org.mdevlamynck.qttt.client.controllers.GameClient;
-import org.mdevlamynck.qttt.common.network.EMessages;
-import org.mdevlamynck.qttt.common.network.datastruct.Client;
+import org.mdevlamynck.qttt.client.network.datastructs.Server;
+import org.mdevlamynck.qttt.common.network.BasicHandler;
+import org.mdevlamynck.qttt.common.network.ConcurrentQueue;
+import org.mdevlamynck.qttt.common.network.datastruct.OtherEndMessage;
+import org.mdevlamynck.qttt.common.network.messages.EPrefixes;
 
-public class ChatHandler extends Thread {
+public class ChatHandler extends BasicHandler {
 	
-	private GameClient	controller	= null;
-	private	Client		server		= null;
+	private GameClient				controller	= null;
+	private	Server					server		= null;
 	
-	public ChatHandler(GameClient controller, Client server)
+	public ChatHandler(GameClient controller, Server server)
 	{
-		this.controller	= controller;
-		this.server		= server;
+		handlerPrefix			= EPrefixes.CHAT;
+		
+		this.controller			= controller;
+		this.server				= server;
 	}
 	
 	@Override
@@ -22,7 +27,7 @@ public class ChatHandler extends Thread {
 		{
 			try
 			{
-				controller.addToChat(server.chat.pop(), true);
+				controller.addToChat(server.gameChat.pop(), true);
 			}
 			catch(InterruptedException e)
 			{
@@ -33,7 +38,12 @@ public class ChatHandler extends Thread {
 	}
 
 	public void sendChatMessg(String sendText) {
-		server.out.println(EMessages.CHAT_PREFIX.toString() + sendText);
+		writeLine(server, sendText);
+	}
+
+	@Override
+	public void addMessage(OtherEndMessage mess) {
+		server.gameChat.push(mess.message);
 	}
 
 }

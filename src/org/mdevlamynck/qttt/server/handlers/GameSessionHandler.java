@@ -5,37 +5,43 @@ import org.mdevlamynck.qttt.common.gamelogic.IHMBackend;
 import org.mdevlamynck.qttt.common.gamelogic.Exceptions.StopGameException;
 import org.mdevlamynck.qttt.common.gamelogic.datastruct.GameResult;
 import org.mdevlamynck.qttt.common.gamelogic.datastruct.Turn;
-import org.mdevlamynck.qttt.common.network.EMessages;
-import org.mdevlamynck.qttt.common.network.datastruct.Client;
+import org.mdevlamynck.qttt.common.network.BasicHandler;
+import org.mdevlamynck.qttt.common.network.ConcurrentQueue;
+import org.mdevlamynck.qttt.common.network.datastruct.OtherEndMessage;
+import org.mdevlamynck.qttt.common.network.messages.EGame;
+import org.mdevlamynck.qttt.common.network.messages.EPrefixes;
+import org.mdevlamynck.qttt.server.datastructs.Client;
 
-public class GameSessionHandler extends Thread implements IHMBackend {
+public class GameSessionHandler extends BasicHandler implements IHMBackend {
 	
-	private Client			p1;
-	private Client			p2;
+	private Client					p1;
+	private Client					p2;
 	
-	private GameLogic		gl				= null;
+	private GameLogic				gl		= null;
 	
-	private ChatHandler		chatFromP1		= null;
-	private ChatHandler		chatFromP2		= null;
+	private ChatHandler				chat	= null;
+	
+	private ConcurrentQueue<String> messP1	= new ConcurrentQueue<String>();
+	private ConcurrentQueue<String> messP2	= new ConcurrentQueue<String>();
 	
 	public GameSessionHandler(Client p1, Client p2)
 	{
+		handlerPrefix	= EPrefixes.GAME;
+
 		this.p1 		= p1;
 		this.p2 		= p2;
 		
 		p1.gameHandler	= this;
 		p2.gameHandler	= this;
 		
-		writeLine(p1, EMessages.GAME_START.toString());
+		writeLine(p1, EGame.START.toString());
 		writeLine(p1, "1");
-		writeLine(p2, EMessages.GAME_START.toString());
+		writeLine(p2, EGame.START.toString());
 		writeLine(p2, "2");
 		
-		chatFromP1 = new ChatHandler(this, p1, p2);
-		chatFromP2 = new ChatHandler(this, p2, p1);
+		chat = new ChatHandler(p1, p2);
 		
-		chatFromP1.start();
-		chatFromP2.start();
+		chat.start();
 	}
 	
 	@Override
@@ -44,13 +50,11 @@ public class GameSessionHandler extends Thread implements IHMBackend {
 		gl = new GameLogic(this);
 		gl.runGame();
 		
-		chatFromP1.interrupt();
-		chatFromP2.interrupt();
+		chat.interrupt();
 
 		try
 		{
-			chatFromP1.join();
-			chatFromP2.join();
+			chat.join();
 		}
 		catch (InterruptedException e)
 		{
@@ -62,20 +66,27 @@ public class GameSessionHandler extends Thread implements IHMBackend {
 
 	@Override
 	public Turn playTurn(boolean isP1) throws StopGameException {
-		Client	player	= null;
-		Turn	turn	= null;
+		Client					player	= null;
+		ConcurrentQueue<String>	mess	= null;
+		Turn					turn	= null;
 		
 		if(isP1)
-			player = p1;
+		{
+			player	= p1;
+			mess	= messP1;
+		}
 		else
-			player = p2;
+		{
+			player	= p2;
+			mess	= messP2;
+		}
 				
-		writeLine(player, EMessages.GAME_REQUEST_TURN.toString());
+		writeLine(player, EGame.REQUEST_TURN.toString());
 		turn	= new Turn();
 		
 		try
 		{
-			turn.fromString(player.game.pop());
+			turn.fromString(mess.pop());
 		}
 		catch(InterruptedException e)
 		{
@@ -87,19 +98,26 @@ public class GameSessionHandler extends Thread implements IHMBackend {
 
 	@Override
 	public int chooseCycle(boolean isP1) throws StopGameException {
-		Client	player	= null;
-		int		choose	= -1;
+		Client					player	= null;
+		ConcurrentQueue<String>	mess	= null;
+		int						choose	= -1;
 		
 		if(isP1)
-			player = p1;
+		{
+			player	= p1;
+			mess	= messP1;
+		}
 		else
-			player = p2;
+		{
+			player	= p2;
+			mess	= messP2;
+		}
 		
-		writeLine(player, EMessages.GAME_REQUEST_CHOICE.toString());
+		writeLine(player, EGame.REQUEST_CHOICE.toString());
 		
 		try
 		{
-			choose = Integer.parseInt(player.game.pop());
+			choose = Integer.parseInt(mess.pop());
 		}
 		catch(InterruptedException e)
 		{
@@ -111,10 +129,10 @@ public class GameSessionHandler extends Thread implements IHMBackend {
 
 	@Override
 	public void gameFinished(GameResult result) {
-		writeLine(p1, EMessages.GAME_FINISHED.toString());
+		writeLine(p1, EGame.FINISHED.toString());
 		writeLine(p1, result.toString());
 			
-		writeLine(p2, EMessages.GAME_FINISHED.toString());
+		writeLine(p2, EGame.FINISHED.toString());
 		writeLine(p2, result.toString());
 	}
 
@@ -123,19 +141,19 @@ public class GameSessionHandler extends Thread implements IHMBackend {
 		if(turn == null)
 			return;
 		
-		writeLine(p1, EMessages.GAME_OTHER_TURN.toString());
+		writeLine(p1, EGame.OTHER_TURN.toString());
 		writeLine(p1, turn.toString());
 			
-		writeLine(p2, EMessages.GAME_OTHER_TURN.toString());
+		writeLine(p2, EGame.OTHER_TURN.toString());
 		writeLine(p2, turn.toString());
 	}
 
 	@Override
 	public void choice(int choice) {
-		writeLine(p1, EMessages.GAME_OTHER_CHOICE.toString());
+		writeLine(p1, EGame.OTHER_CHOICE.toString());
 		writeLine(p1, ((Integer)choice).toString());
 			
-		writeLine(p2, EMessages.GAME_OTHER_CHOICE.toString());
+		writeLine(p2, EGame.OTHER_CHOICE.toString());
 		writeLine(p2, ((Integer)choice).toString());
 	}
 	
@@ -143,15 +161,19 @@ public class GameSessionHandler extends Thread implements IHMBackend {
 	public void gameInterrupted()
 	{
 		if(!p1.socket.isClosed())
-			writeLine(p1, EMessages.GAME_FINISHED.toString());
+			writeLine(p1, EGame.INTERRUPTED.toString());
 		
 		if(!p2.socket.isClosed())
-			writeLine(p2, EMessages.GAME_FINISHED.toString());
+			writeLine(p2, EGame.INTERRUPTED.toString());
 	}
 	
-	private void writeLine(Client client, String line)
+	@Override
+	public void addMessage(OtherEndMessage mess)
 	{
-		client.out.println(EMessages.GAME_PREFIX.toString() + line);
+		if		(mess.client.equals(p1))
+			messP1.push(mess.message);
+		else if	(mess.client.equals(p2))
+			messP2.push(mess.message);
 	}
 
 }

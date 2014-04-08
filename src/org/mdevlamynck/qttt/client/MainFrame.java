@@ -12,9 +12,10 @@ import org.mdevlamynck.qttt.client.controllers.LobbyClient;
 import org.mdevlamynck.qttt.client.network.NetworkInputHandler;
 
 public class MainFrame extends JFrame {
+
+	private static final long serialVersionUID = 3007658074038398950L;
 	
 	private NetworkInputHandler	network	= null;
-	private	boolean				quit	= false;
 	private JPanel				cards	= new JPanel(new CardLayout());
 	private BasicController		current	= null;
 	private	ChooseServer		choose	= new ChooseServer(this);

@@ -4,7 +4,6 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
 import org.mdevlamynck.qttt.client.controllers.GameClient;
-import org.mdevlamynck.qttt.common.gamelogic.GameLogic;
 
 public class ChatListener implements ActionListener {
 	
