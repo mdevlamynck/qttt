@@ -123,7 +123,20 @@ public class GameServer {
 	{
 		synchronized (clientsLock)
 		{
-			clients.remove(client);
+			if(clients.remove(client))
+			{
+				client.readerHandler.interrupt();
+				client.gameHandler.interrupt();
+
+				try
+				{
+					client.socket.close();
+				}
+				catch(Exception e)
+				{
+					System.err.println(e.getMessage());
+				}
+			}
 		}
 	}
 	

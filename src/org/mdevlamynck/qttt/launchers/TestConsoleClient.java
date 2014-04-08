@@ -62,6 +62,12 @@ public class TestConsoleClient implements IHMBackend{
 	public void choice(int choice) {
 		// TODO Auto-generated method stub	
 	}
+
+	@Override
+	public void gameInterrupted() {
+		// TODO Auto-generated method stub
+		
+	}
 	
 	private void render()
 	{

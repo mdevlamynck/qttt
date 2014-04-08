@@ -3,10 +3,11 @@ package org.mdevlamynck.qttt.common.gamelogic;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.mdevlamynck.qttt.common.gamelogic.Exceptions.StopGameException;
 import org.mdevlamynck.qttt.common.gamelogic.datastruct.GameResult;
 import org.mdevlamynck.qttt.common.gamelogic.datastruct.GridSquare;
-import org.mdevlamynck.qttt.common.gamelogic.datastruct.Turn;
 import org.mdevlamynck.qttt.common.gamelogic.datastruct.GridSquare.EPlayer;
+import org.mdevlamynck.qttt.common.gamelogic.datastruct.Turn;
 
 public class GameLogic {
 	
@@ -51,22 +52,30 @@ public class GameLogic {
 	
 	public void runGame()
 	{
-		while(!isGameFinished())
+		try
 		{
-			ihm.lastTurn(lastTurn);
-			while(!playTurn(ihm.playTurn( (currentTurn % 2) == 0 )));
-
-			if(checkCycles())
+			while(!isGameFinished())
 			{
-				int i = -1;
 				ihm.lastTurn(lastTurn);
-				while(!resolvCycle(i = ihm.chooseCycle( (currentTurn % 2) == 0 )));
-				ihm.choice(i);
+				while(!playTurn(ihm.playTurn( (currentTurn % 2) == 0 )));
+	
+				if(checkCycles())
+				{
+					int i = -1;
+					ihm.lastTurn(lastTurn);
+					while(!resolvCycle(i = ihm.chooseCycle( (currentTurn % 2) == 0 )));
+					ihm.choice(i);
+				}
 			}
+			
+			processScore();
+			ihm.gameFinished( getResult() );
 		}
-		
-		processScore();
-		ihm.gameFinished( getResult() );
+		catch(StopGameException e)
+		{
+			ihm.gameInterrupted();
+			return;
+		}
 	}
 	
 	public boolean playTurn(Turn t)

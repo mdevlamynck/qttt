@@ -19,7 +19,7 @@ public class ChatHandler extends Thread {
 	@Override
 	public void run()
 	{
-		while(!game.getQuit())
+		while(true)
 		{
 			try
 			{
@@ -28,7 +28,7 @@ public class ChatHandler extends Thread {
 			}
 			catch(InterruptedException e)
 			{
-				
+				break;
 			}
 		}
 	}

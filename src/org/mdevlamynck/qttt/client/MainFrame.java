@@ -13,13 +13,13 @@ import org.mdevlamynck.qttt.client.network.NetworkInputHandler;
 
 public class MainFrame extends JFrame {
 	
-	private NetworkInputHandler	network	= new NetworkInputHandler(this);
+	private NetworkInputHandler	network	= null;
 	private	boolean				quit	= false;
 	private JPanel				cards	= new JPanel(new CardLayout());
 	private BasicController		current	= null;
 	private	ChooseServer		choose	= new ChooseServer(this);
-	private	LobbyClient			lobby	= new LobbyClient(this, network);
-	private	GameClient			game	= new GameClient(this, network);
+	private	LobbyClient			lobby	= new LobbyClient(this);
+	private	GameClient			game	= new GameClient(this);
 	
 	public MainFrame()
 	{
@@ -49,7 +49,7 @@ public class MainFrame extends JFrame {
 		CardLayout cl = (CardLayout) cards.getLayout();
 		cl.show(cards, "lobby");
 		current	= lobby;
-		lobby.start();
+		lobby.start(network);
 	}
 	
 	public void gameClient()
@@ -57,10 +57,11 @@ public class MainFrame extends JFrame {
 		CardLayout cl = (CardLayout) cards.getLayout();
 		cl.show(cards, "game");
 		current = game;
-		game.start();
+		game.start(network);
 	}
 
 	public void setServer(String address, int port) {
+		network	= new NetworkInputHandler(this);
 		if(network.setServer(address, port))
 			lobbyClient();
 	}
@@ -68,14 +69,12 @@ public class MainFrame extends JFrame {
 	public void lostConnection()
 	{
 		current.quit();
+		chooseServer();
 	}
-
-	public void quit() {
-		quit = true;
-	}
-
-	public boolean getQuit() {
-		return quit;
+	
+	public BasicController getCurrent()
+	{
+		return current;
 	}
 
 }

@@ -46,20 +46,23 @@ public class NetworkInputHandler extends Thread {
 		if(controller == null || address == null || port == -1)
 		{
 			if(controller != null)
-				controller.quit();
+				controller.getCurrent().quit();
 			
 			return;
 		}
 
 		String line;
 		
-		while(!controller.getQuit())
+		while(true)
 		{
 			try
 			{
 				line = server.in.nextLine();
+
+				if		(line.equals(EMessages.SERVER_STOPPING.toString()))
+					break;
 				
-				if		(line.startsWith(EMessages.GAME_PREFIX.toString()))
+				else if	(line.startsWith(EMessages.GAME_PREFIX.toString()))
 					server.game.push(line.substring(EMessages.GAME_PREFIX.toString().length()));
 	
 				else if	(line.startsWith(EMessages.CHAT_PREFIX.toString()))
@@ -67,9 +70,11 @@ public class NetworkInputHandler extends Thread {
 			}
 			catch(NoSuchElementException e)
 			{
-				controller.lostConnection();
+				break;
 			}
 		}
+
+		controller.lostConnection();
 	}
 
 	public Client getServer() {

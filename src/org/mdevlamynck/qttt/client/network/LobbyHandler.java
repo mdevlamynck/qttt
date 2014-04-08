@@ -20,7 +20,7 @@ public class LobbyHandler extends Thread {
 	{
 		String line;
 		
-		while(!controller.getQuit())
+		while(true)
 		{
 			try
 			{

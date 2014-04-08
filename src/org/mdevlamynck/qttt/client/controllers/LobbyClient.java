@@ -9,24 +9,21 @@ import org.mdevlamynck.qttt.client.views.LobbyPanel;
 
 public class LobbyClient extends BasicController {
 
-	private MainFrame			parent	= null;
 	private LobbyPanel			view	= new LobbyPanel(this);
 	private NetworkInputHandler	network	= null;
 	private LobbyHandler		lobby	= null;
 	
-	public LobbyClient(MainFrame parent, NetworkInputHandler network)
+	public LobbyClient(MainFrame parent)
 	{
 		super(parent);
-
-		this.parent		= parent;
-		this.network	= network;
-		
-		lobby			= new LobbyHandler(this, network.getServer());
 	}
 	
-	public void start()
+	public void start(NetworkInputHandler network)
 	{
+		this.network	= network;
 		network.start();
+
+		lobby			= new LobbyHandler(this, network.getServer());
 		lobby.start();
 	}
 	
@@ -39,8 +36,6 @@ public class LobbyClient extends BasicController {
 	{
 		network.interrupt();
 		lobby.interrupt();
-
-		parent.chooseServer();
 	}
 	
 	public void toConnection() {

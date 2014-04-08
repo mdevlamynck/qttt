@@ -14,8 +14,6 @@ import org.mdevlamynck.qttt.common.gamelogic.datastruct.Turn;
 
 public class GameClient extends BasicController {
 	
-	private MainFrame			parent				= null;
-	
 	private GamePanel 			view 				= new GamePanel(this);
 	
 	private	GameLogic			gl					= null;
@@ -31,15 +29,9 @@ public class GameClient extends BasicController {
 	
 	private GridSquare[][]		grid				= null;
 	
-	public GameClient(MainFrame parent, NetworkInputHandler network)
+	public GameClient(MainFrame parent)
 	{
 		super(parent);
-
-		this.parent		= parent;
-		this.network	= network;
-		
-		this.game		= new GameSessionHandler(this, network.getServer());
-		this.chat		= new ChatHandler(this, network.getServer());
 
 		resetGame();
 		view.init();
@@ -48,8 +40,13 @@ public class GameClient extends BasicController {
 		view.enableSquares(false);
 	}
 	
-	public void start()
+	public void start(NetworkInputHandler network)
 	{
+		this.network	= network;
+		
+		this.game		= new GameSessionHandler(this, network.getServer());
+		this.chat		= new ChatHandler(this, network.getServer());
+		
 		game.start();
 		chat.start();
 	}
@@ -184,8 +181,6 @@ public class GameClient extends BasicController {
 		network.interrupt();
 		game.interrupt();
 		chat.interrupt();
-
-		parent.chooseServer();
 	}
 	
 	public Panel getPanel()

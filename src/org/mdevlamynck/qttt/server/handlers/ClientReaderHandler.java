@@ -12,8 +12,6 @@ public class ClientReaderHandler extends Thread {
 	
 	private GameServer		server		= null;
 	
-	private	boolean			quit		= false;
-	
 	private Client			client		= null;
 	
 	public ClientReaderHandler(GameServer g, Socket s)
@@ -23,12 +21,16 @@ public class ClientReaderHandler extends Thread {
 
 		System.out.println("Handling Client ...");
 
-		client			= new Client();
-		client.socket	= s;
-		client.reader	= this;
+		client					= new Client();
+		client.socket			= s;
+		client.readerHandler	= this;
 		
-		server			= g;
+		server					= g;
+	}
 
+	@Override
+	public void run()
+	{
 		try
 		{
 			client.in	= new Scanner(client.socket.getInputStream());
@@ -36,20 +38,17 @@ public class ClientReaderHandler extends Thread {
 		}
 		catch(Exception e)
 		{
-			System.err.println("CRH-C " + e.getMessage());
+			return;
 		}
-	}
 
-	@Override
-	public void run()
-	{
 		if(server == null || client.socket == null || client.in == null || client.out == null)
 			return;
 
-		try
+		server.addClient(client);
+		while(true)
 		{
-			server.addClient(client);
-			while(!quit && !server.getQuit())
+
+			try
 			{
 				String message = client.in.nextLine();
 				
@@ -57,8 +56,6 @@ public class ClientReaderHandler extends Thread {
 				{
 					client.out.println(EMessages.SERVER_STOPPING);
 					client.out.flush();
-					
-					quit = true;
 					client.socket.close();
 					
 					server.quit();
@@ -69,11 +66,11 @@ public class ClientReaderHandler extends Thread {
 				else if	(message.startsWith(EMessages.CHAT_PREFIX.toString()))
 					client.chat.push(message.substring(EMessages.CHAT_PREFIX.toString().length()));
 			}
-		}
-		catch(Exception e)
-		{
-			System.err.println("CRH-R " + e.getMessage());
-		}
+			catch(Exception e)
+			{
+				break;
+			}
+		}	
 		
 		System.out.println("Handling Client Done");
 		server.removeClient(client);

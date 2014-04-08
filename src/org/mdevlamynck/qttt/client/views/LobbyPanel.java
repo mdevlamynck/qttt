@@ -13,7 +13,7 @@ public class LobbyPanel extends Panel {
 	public LobbyPanel(LobbyClient controller)
 	{
 		this.controller	= controller;
-		
+
 		add(new JLabel("Waiting for one other player"));
 	}
 

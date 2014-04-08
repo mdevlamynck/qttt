@@ -23,7 +23,7 @@ public class GameSessionHandler extends Thread {
 	{
 		String line = null;
 		
-		while(!controller.getQuit())
+		while(true)
 		{
 			try
 			{
@@ -33,10 +33,19 @@ public class GameSessionHandler extends Thread {
 					player = Integer.parseInt(readLine()) == 1 ? EPlayer.P1 : EPlayer.P2;
 			
 				else if	( line.equals(EMessages.GAME_REQUEST_TURN.toString())		)
-					writeLine	( controller.getTurn().toString()				);
+				{
+					Turn turn	= controller.getTurn();
+					if(turn != null)
+						writeLine	( turn.toString()				);
+				}
+					
 				
 				else if	( line.equals(EMessages.GAME_REQUEST_CHOICE.toString())	)
-					writeLine	( ((Integer)controller.getChoice()).toString()	);
+				{
+					int choice	= controller.getChoice();
+					if(choice != -1)
+						writeLine	( ((Integer)choice).toString()	);
+				}
 				
 				else if	( line.equals(EMessages.GAME_OTHER_TURN.toString())		)
 					controller.addTurn		( new Turn().fromString(readLine()) );
@@ -46,11 +55,12 @@ public class GameSessionHandler extends Thread {
 				else if	( line.equals(EMessages.GAME_FINISHED.toString())		)
 				{
 					readLine();
-					controller.quit();
+					break;
 				}
 			}
 			catch(InterruptedException e)
 			{
+				break;
 			}
 		}
 		

@@ -2,6 +2,7 @@ package org.mdevlamynck.qttt.server.handlers;
 
 import org.mdevlamynck.qttt.common.gamelogic.GameLogic;
 import org.mdevlamynck.qttt.common.gamelogic.IHMBackend;
+import org.mdevlamynck.qttt.common.gamelogic.Exceptions.StopGameException;
 import org.mdevlamynck.qttt.common.gamelogic.datastruct.GameResult;
 import org.mdevlamynck.qttt.common.gamelogic.datastruct.Turn;
 import org.mdevlamynck.qttt.common.network.EMessages;
@@ -17,15 +18,13 @@ public class GameSessionHandler extends Thread implements IHMBackend {
 	private ChatHandler		chatFromP1		= null;
 	private ChatHandler		chatFromP2		= null;
 	
-	private boolean			quit			= false;
-	
 	public GameSessionHandler(Client p1, Client p2)
 	{
-		this.p1 = p1;
-		this.p2 = p2;
+		this.p1 		= p1;
+		this.p2 		= p2;
 		
-		p1.session = this;
-		p2.session = this;
+		p1.gameHandler	= this;
+		p2.gameHandler	= this;
 		
 		writeLine(p1, EMessages.GAME_START.toString());
 		writeLine(p1, "1");
@@ -42,32 +41,27 @@ public class GameSessionHandler extends Thread implements IHMBackend {
 	@Override
 	public void run()
 	{
-		try
-		{
-			gl = new GameLogic(this);
-			gl.runGame();
-		}
-		catch(Exception e)
-		{
-			System.err.println("GSH-R " + e.getMessage());
-		}
-		
-		quit = true;
+		gl = new GameLogic(this);
+		gl.runGame();
 		
 		chatFromP1.interrupt();
 		chatFromP2.interrupt();
 
-		try {
+		try
+		{
 			chatFromP1.join();
 			chatFromP2.join();
-		} catch (InterruptedException e) {
+		}
+		catch (InterruptedException e)
+		{
 			// TODO Auto-generated catch block
 			e.printStackTrace();
+			return;
 		}
 	}
 
 	@Override
-	public Turn playTurn(boolean isP1) {
+	public Turn playTurn(boolean isP1) throws StopGameException {
 		Client	player	= null;
 		Turn	turn	= null;
 		
@@ -85,14 +79,14 @@ public class GameSessionHandler extends Thread implements IHMBackend {
 		}
 		catch(InterruptedException e)
 		{
-			System.err.println(e.getMessage());
+			throw new StopGameException();
 		}
 		
 		return turn;
 	}
 
 	@Override
-	public int chooseCycle(boolean isP1) {
+	public int chooseCycle(boolean isP1) throws StopGameException {
 		Client	player	= null;
 		int		choose	= -1;
 		
@@ -109,7 +103,7 @@ public class GameSessionHandler extends Thread implements IHMBackend {
 		}
 		catch(InterruptedException e)
 		{
-			System.err.println(e.getMessage());
+			throw new StopGameException();
 		}
 		
 		return choose;
@@ -145,13 +139,19 @@ public class GameSessionHandler extends Thread implements IHMBackend {
 		writeLine(p2, ((Integer)choice).toString());
 	}
 	
+	@Override
+	public void gameInterrupted()
+	{
+		if(!p1.socket.isClosed())
+			writeLine(p1, EMessages.GAME_FINISHED.toString());
+		
+		if(!p2.socket.isClosed())
+			writeLine(p2, EMessages.GAME_FINISHED.toString());
+	}
+	
 	private void writeLine(Client client, String line)
 	{
 		client.out.println(EMessages.GAME_PREFIX.toString() + line);
-	}
-
-	public boolean getQuit() {
-		return quit;
 	}
 
 }
