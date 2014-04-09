@@ -47,7 +47,7 @@ public class NetworkInputHandler extends Thread {
 		if(controller == null || address == null || port == -1)
 		{
 			if(controller != null)
-				controller.getCurrent().quit();
+				controller.lostConnection();
 			
 			return;
 		}

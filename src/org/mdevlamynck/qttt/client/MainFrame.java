@@ -15,12 +15,20 @@ public class MainFrame extends JFrame {
 
 	private static final long serialVersionUID = 3007658074038398950L;
 	
-	private NetworkInputHandler	network	= null;
-	private JPanel				cards	= new JPanel(new CardLayout());
-	private BasicController		current	= null;
-	private	ChooseServer		choose	= new ChooseServer(this);
-	private	LobbyClient			lobby	= new LobbyClient(this);
-	private	GameClient			game	= new GameClient(this);
+	private NetworkInputHandler	network			= null;
+	private JPanel				cards			= new JPanel(new CardLayout());
+	private	ChooseServer		choose			= new ChooseServer(this);
+	private	LobbyClient			lobby			= new LobbyClient(this);
+	private	GameClient			game			= new GameClient(this);
+	
+	private boolean				isGameLaunched	= false;
+	
+	public enum EScreen
+	{
+		CHOOSE,
+		LOBBY,
+		GAME
+	}
 	
 	public MainFrame()
 	{
@@ -28,54 +36,55 @@ public class MainFrame extends JFrame {
 		setVisible(true);
 		setTitle("QTTT");
 
-		cards.add(choose.getPanel(), "choose");
-		cards.add(lobby.getPanel(), "lobby");
-		cards.add(game.getPanel(), "game");
+		cards.add( choose.getPanel(),	EScreen.CHOOSE.toString()	);
+		cards.add( lobby.getPanel(),	EScreen.LOBBY.toString()	);
+		cards.add( game.getPanel(),		EScreen.GAME.toString()		);
 		add(cards);
 		
 		setSize(400, 400);
-		
-		chooseServer();
+
+		switchTo(EScreen.CHOOSE);
 	}
 	
-	public void chooseServer()
+	public void switchTo(EScreen screen)
 	{
 		CardLayout cl = (CardLayout) cards.getLayout();
-		cl.show(cards, "choose");
-		current	= choose;
+		cl.show(cards, screen.toString());
 	}
-	
-	public void lobbyClient()
-	{
-		CardLayout cl = (CardLayout) cards.getLayout();
-		cl.show(cards, "lobby");
-		current	= lobby;
-		lobby.start(network);
+
+	public void connectToServer(String address, int port) {
+		network	= new NetworkInputHandler(this);
+		if(network.setServer(address, port))
+		{
+			switchTo(EScreen.LOBBY);
+			lobby.start(network);
+		}
 	}
-	
-	public void gameClient()
+
+	public void launchGame()
 	{
-		CardLayout cl = (CardLayout) cards.getLayout();
-		cl.show(cards, "game");
-		current = game;
+		isGameLaunched = true;
+		switchTo(EScreen.GAME);
 		game.start(network);
 	}
 
-	public void setServer(String address, int port) {
-		network	= new NetworkInputHandler(this);
-		if(network.setServer(address, port))
-			lobbyClient();
+	public void quitGame()
+	{
+		isGameLaunched = false;
+		switchTo(EScreen.LOBBY);
+		game.quit();
 	}
 	
 	public void lostConnection()
 	{
-		current.quit();
-		chooseServer();
-	}
-	
-	public BasicController getCurrent()
-	{
-		return current;
+		lobby.quit();
+		if(isGameLaunched)
+		{
+			isGameLaunched = false;
+			game.quit();
+		}
+
+		switchTo(EScreen.CHOOSE);
 	}
 
 }

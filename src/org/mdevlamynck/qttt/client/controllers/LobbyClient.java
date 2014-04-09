@@ -3,6 +3,7 @@ package org.mdevlamynck.qttt.client.controllers;
 import java.awt.Panel;
 
 import org.mdevlamynck.qttt.client.MainFrame;
+import org.mdevlamynck.qttt.client.MainFrame.EScreen;
 import org.mdevlamynck.qttt.client.network.LobbyHandler;
 import org.mdevlamynck.qttt.client.network.NetworkInputHandler;
 import org.mdevlamynck.qttt.client.views.LobbyPanel;
@@ -36,16 +37,14 @@ public class LobbyClient extends BasicController {
 	{
 		network.interrupt();
 		lobby.interrupt();
-		
-		parent.lobbyClient();
-	}
-	
-	public void toConnection() {
-		parent.chooseServer();
 	}
 
 	public void toGame() {
-		parent.gameClient();
+		parent.launchGame();
+	}
+	
+	public void toChoose() {
+		parent.lostConnection();
 	}
 
 }

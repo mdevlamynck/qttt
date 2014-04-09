@@ -55,11 +55,13 @@ public class GameSessionHandler extends BasicHandler {
 				
 				else if	( line.equals(EGame.OTHER_CHOICE.toString())	)
 					controller.addChoice	( Integer.parseInt(readLine()) 		);
+
 				else if	( line.equals(EGame.FINISHED.toString())		)
 				{
 					readLine();
 					break;
 				}
+
 				else if	( line.equals(EGame.INTERRUPTED.toString())		)
 				{
 					break;
@@ -70,14 +72,16 @@ public class GameSessionHandler extends BasicHandler {
 				break;
 			}
 		}
-		
-		controller.quit();
+
+		controller.toLobby();
 	}
 
 	private String readLine() throws InterruptedException
 	{
 		String line = "";
 		line = server.game.pop();
+
+		System.out.println(line);
 
 		controller.addToLog(line, true);
 		return line;

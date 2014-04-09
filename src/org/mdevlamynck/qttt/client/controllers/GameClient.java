@@ -4,6 +4,7 @@ package org.mdevlamynck.qttt.client.controllers;
 import java.awt.Panel;
 
 import org.mdevlamynck.qttt.client.MainFrame;
+import org.mdevlamynck.qttt.client.MainFrame.EScreen;
 import org.mdevlamynck.qttt.client.network.ChatHandler;
 import org.mdevlamynck.qttt.client.network.GameSessionHandler;
 import org.mdevlamynck.qttt.client.network.NetworkInputHandler;
@@ -181,9 +182,13 @@ public class GameClient extends BasicController {
 
 	public void quit()
 	{
-		network.interrupt();
 		game.interrupt();
 		chat.interrupt();
+	}
+	
+	public void toLobby()
+	{
+		parent.quitGame();
 	}
 	
 	public Panel getPanel()

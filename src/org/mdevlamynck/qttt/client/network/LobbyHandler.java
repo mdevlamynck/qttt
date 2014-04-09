@@ -39,7 +39,7 @@ public class LobbyHandler extends BasicHandler {
 			}
 			catch(InterruptedException e)
 			{
-				controller.toConnection();
+				controller.toChoose();
 				break;
 			}
 		}
