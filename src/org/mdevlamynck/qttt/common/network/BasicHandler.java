@@ -12,7 +12,6 @@ public abstract class BasicHandler extends Thread {
 
 	public void writeLine(OtherEnd client, String line)
 	{
-		System.out.println(handlerPrefix.toString() + " " + line);
 		client.out.println(handlerPrefix.toString() + line);
 	}
 

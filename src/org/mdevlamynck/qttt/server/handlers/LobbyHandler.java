@@ -62,12 +62,14 @@ public class LobbyHandler extends BasicHandler {
 		sessions.clear();
 	}
 
-	public void add(Client client) {
+	public void add(Client client)
+	{
+
+		clients.add(client);
 		
 		if(waitingClient == null)
 		{
 			waitingClient = client;
-			clients.add(client);
 		}
 		else
 		{
