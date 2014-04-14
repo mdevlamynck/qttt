@@ -72,7 +72,7 @@ public class GameClient extends BasicController {
 		String text = view.getSendText();
 		chat.sendChatMessg(text);
 		view.clearSendText();
-		view.addToChat(text, false);
+		addToChat(text, false);
 	}
 
 	public Turn getTurn()

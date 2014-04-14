@@ -85,7 +85,7 @@ public class GameSessionHandler extends BasicHandler {
 	
 	private void writeLine(String line)
 	{
-		server.out.println(EPrefixes.GAME.toString() + line);
+		super.writeLine(server, line);
 		controller.addToLog(line, false);
 	}
 
