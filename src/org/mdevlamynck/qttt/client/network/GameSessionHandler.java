@@ -38,16 +38,12 @@ public class GameSessionHandler extends BasicHandler {
 			
 				else if	( line.equals(EGame.REQUEST_TURN.toString())	)
 				{
-					Turn turn	= controller.getTurn();
-					if(turn != null)
-						writeLine	( turn.toString()				);
+					new RequestTurn().start();
 				}
 
 				else if	( line.equals(EGame.REQUEST_CHOICE.toString())	)
 				{
-					int choice	= controller.getChoice();
-					if(choice != -1)
-						writeLine	( ((Integer)choice).toString()	);
+					new RequestChoice().start();
 				}
 				
 				else if	( line.equals(EGame.OTHER_TURN.toString())		)
@@ -98,4 +94,25 @@ public class GameSessionHandler extends BasicHandler {
 		server.game.push(mess.message);
 	}
 	
+	private class RequestTurn extends Thread
+	{
+		@Override
+		public void run()
+		{
+			Turn turn	= controller.getTurn();
+			if(turn != null)
+				writeLine	( turn.toString()				);
+		}
+	}
+
+	private class RequestChoice extends Thread
+	{
+		@Override
+		public void run()
+		{
+			int choice	= controller.getChoice();
+			if(choice != -1)
+				writeLine	( ((Integer)choice).toString()	);
+		}
+	}
 }
