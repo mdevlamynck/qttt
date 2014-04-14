@@ -9,5 +9,6 @@ public class OtherEnd {
 	public Socket		socket	= null;
 	public Scanner		in		= null;
 	public PrintWriter	out		= null;
+	public String		name	= "nonickname";
 
 }

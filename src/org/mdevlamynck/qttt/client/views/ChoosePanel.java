@@ -14,7 +14,8 @@ import org.mdevlamynck.qttt.client.controllers.listeners.QuitChooseListener;
 public class ChoosePanel extends Panel {
 
 	private static final long serialVersionUID = -2583801359782860518L;
-	
+
+	private JTextField		nameField	= new JTextField("nonickname");
 	private JTextField		serverField	= new JTextField("localhost");
 	private JTextField		portField	= new JTextField("42042");
 	private JButton			quitBtn		= new JButton("Quit");
@@ -22,8 +23,10 @@ public class ChoosePanel extends Panel {
 	
 	public ChoosePanel(ChooseServer controller)
 	{
-		setLayout(new GridLayout(3, 2, 5, 5));
+		setLayout(new GridLayout(4, 2, 5, 5));
 		
+		add(new JLabel("Nick Name : "));
+		add(nameField);
 		add(new JLabel("Server : "));
 		add(serverField);
 		add(new JLabel("Port : "));
@@ -33,6 +36,11 @@ public class ChoosePanel extends Panel {
 		
 		quitBtn.addActionListener(new QuitChooseListener(controller));
 		connectBtn.addActionListener(new ConnectChooseListener(controller));
+	}
+	
+	public String getName()
+	{
+		return nameField.getText();
 	}
 	
 	public String getAddress()

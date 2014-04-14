@@ -1,6 +1,7 @@
 package org.mdevlamynck.qttt.client.controllers;
 
 import java.awt.Panel;
+import java.util.List;
 
 import org.mdevlamynck.qttt.client.MainFrame;
 import org.mdevlamynck.qttt.client.network.LobbyHandler;
@@ -44,6 +45,10 @@ public class LobbyClient extends BasicController {
 	
 	public void toChoose() {
 		parent.lostConnection();
+	}
+
+	public void setSession(List<String> sessions) {
+		view.setSessions(sessions);
 	}
 
 }

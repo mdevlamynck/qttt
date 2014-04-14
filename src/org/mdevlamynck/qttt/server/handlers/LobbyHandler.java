@@ -22,7 +22,7 @@ public class LobbyHandler extends BasicHandler {
 	
 	public LobbyHandler()
 	{
-		handlerPrefix	= EPrefixes.LOBBY;	
+		handlerPrefix	= EPrefixes.LOBBY;
 	}
 	
 	@Override
@@ -33,10 +33,19 @@ public class LobbyHandler extends BasicHandler {
 			try
 			{
 				OtherEndMessage mess = messages.pop();
-				if		(mess.message.contains(ELobby.ADD_CLIENT.toString()))
+				if		(mess.message.startsWith(ELobby.ADD_CLIENT.toString()))
 					add((Client) mess.client);
-				else if (mess.message.contains(ELobby.REMOVE_CLIENT.toString()))
+				else if (mess.message.startsWith(ELobby.REMOVE_CLIENT.toString()))
 					remove((Client) mess.client);
+				else if (mess.message.startsWith(ELobby.CLIENT_NAME.toString()))
+					mess.client.name = messages.pop().message;
+				else if	(mess.message.startsWith(ELobby.REQUEST_SESSION_LIST.toString()))
+				{
+					String clientsLine = ELobby.REPLY_SESSION_LIST.toString();
+					for(Client c : clients)
+						clientsLine += c.name + " ";
+					writeLine(mess.client, clientsLine);
+				}
 			}
 			catch(InterruptedException e)
 			{
@@ -73,8 +82,8 @@ public class LobbyHandler extends BasicHandler {
 		}
 		else
 		{
-			writeLine( waitingClient,	EGame.START.toString()	);
-			writeLine( client,			EGame.START.toString()	);
+			writeLine( waitingClient,	ELobby.START.toString()	);
+			writeLine( client,			ELobby.START.toString()	);
 			
 			GameSessionHandler g	= new GameSessionHandler(waitingClient, client);
 			waitingClient			= null;
@@ -89,8 +98,11 @@ public class LobbyHandler extends BasicHandler {
 	{
 		if(clients.remove(client))
 		{
-			client.readerHandler.interrupt();
-			client.gameHandler.interrupt();
+			if(client.readerHandler != null)
+				client.readerHandler.interrupt();
+
+			if(client.gameHandler != null)
+				client.gameHandler.interrupt();
 
 			try
 			{

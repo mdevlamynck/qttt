@@ -40,7 +40,7 @@ public class MainFrame extends JFrame {
 		cards.add( game.getPanel(),		EScreen.GAME.toString()		);
 		add(cards);
 		
-		setSize(400, 400);
+		setSize(450, 450);
 
 		switchTo(EScreen.CHOOSE);
 	}
@@ -51,9 +51,9 @@ public class MainFrame extends JFrame {
 		cl.show(cards, screen.toString());
 	}
 
-	public void connectToServer(String address, int port) {
+	public void connectToServer(String name, String address, int port) {
 		network	= new NetworkInputHandler(this);
-		if(network.setServer(address, port))
+		if(network.setServer(name, address, port))
 		{
 			switchTo(EScreen.LOBBY);
 			lobby.start(network);

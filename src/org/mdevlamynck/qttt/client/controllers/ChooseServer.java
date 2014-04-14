@@ -20,7 +20,7 @@ public class ChooseServer extends BasicController {
 	
 	public void connect()
 	{
-		parent.connectToServer(view.getAddress(), view.getPort());
+		parent.connectToServer(view.getName(), view.getAddress(), view.getPort());
 	}
 	
 	public void quit()

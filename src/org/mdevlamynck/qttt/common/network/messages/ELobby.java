@@ -7,13 +7,18 @@ public enum ELobby {
 	REMOVE_CLIENT,
 	// ------------------------------------------------------------------------
 
-	REQUEST_SESSION_LIST,	/// (Game)		param : map<id, GameSession>
+	CLIENT_NAME,			/// (Game)		param : name
+
+	REQUEST_SESSION_LIST,	/// (Game)		reply : REPLY_SESSION_LIST
+	REPLY_SESSION_LIST,		/// (Server)	param : map<id, GameSession>
 
 	CREATE_SESSION,			/// (Game)		param : name
 	CANCEL_SESSION,			/// (Game)
 
-	CONNECT_TO_GAME,		/// (Game)		param : id
-	OPPONENT_CONNECTED,		/// (Server)	param : id
+	CONNECT_TO_GAME,		/// (Game)		param : name
+	OPPONENT_CONNECTED,		/// (Server)	param : name
+
+	START,
 
 	NONE
 
