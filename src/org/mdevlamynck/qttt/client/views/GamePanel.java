@@ -2,6 +2,7 @@ package org.mdevlamynck.qttt.client.views;
 
 import java.awt.GridLayout;
 import java.awt.Panel;
+import java.awt.event.ActionListener;
 
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
@@ -11,6 +12,7 @@ import javax.swing.JTextField;
 
 import org.mdevlamynck.qttt.client.controllers.GameClient;
 import org.mdevlamynck.qttt.client.controllers.listeners.ChatListener;
+import org.mdevlamynck.qttt.client.controllers.listeners.QuitListener;
 import org.mdevlamynck.qttt.client.controllers.listeners.SquareListener;
 import org.mdevlamynck.qttt.common.gamelogic.datastruct.GridSquare;
 import org.mdevlamynck.qttt.common.gamelogic.datastruct.GridSquare.EPlayer;
@@ -24,9 +26,10 @@ public class GamePanel extends Panel {
 	
 	private GameClient		controller		= null;
 	
-	private	Panel			board			= new Panel();
-	private	Panel			log				= new Panel();
-	private	Panel			chat			= new Panel();
+	private	Panel			boardPanel		= new Panel();
+	private	Panel			logPanel		= new Panel();
+	private	Panel			chatPanel		= new Panel();
+	private	Panel			chatSendPanel	= new Panel();
 	
 	private JTabbedPane		bottomPanel		= new JTabbedPane();
 	
@@ -35,28 +38,41 @@ public class GamePanel extends Panel {
 	private	JTextArea		chatText		= new JTextArea();
 	private JTextField		sendText		= new JTextField();
 
+	private JButton			sendBtn			= new JButton("Send");
+	private JButton			quitBtn			= new JButton("Quit");
+
 	public GamePanel(GameClient controller)
 	{
 		this.controller = controller;
 		
 		setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));		
 		
-		add(board);
+		add(boardPanel);
 		
 		add(bottomPanel);
 		
-		chat.setLayout(new BoxLayout(chat, BoxLayout.Y_AXIS));
-		chat.add(chatText);
-		chat.add(sendText);
-		chat.setName("Chat");
-		bottomPanel.add(chat);
-		
-		sendText.addActionListener(new ChatListener(controller));
+		chatPanel.setLayout(new BoxLayout(chatPanel, BoxLayout.Y_AXIS));
+		chatPanel.add		(chatText);
+		chatPanel.add		(chatSendPanel);
 
-		log.setLayout(new BoxLayout(log, BoxLayout.Y_AXIS));
-		log.add(logText);
-		log.setName("Server Log");
-		bottomPanel.add(log);
+		chatSendPanel.setLayout(new BoxLayout(chatSendPanel, BoxLayout.X_AXIS));
+		chatSendPanel.add	(sendText);
+		chatSendPanel.add	(sendBtn);
+
+		chatPanel.setName	("Chat");
+		bottomPanel.add		(chatPanel);
+		
+		ActionListener	chatSendListener	= new ChatListener(controller);
+		sendText.addActionListener	(chatSendListener);
+		sendBtn.addActionListener	(chatSendListener);
+
+		logPanel.setLayout(new BoxLayout(logPanel, BoxLayout.Y_AXIS));
+		logPanel.add		(logText);
+		logPanel.setName	("Server Log");
+		bottomPanel.add		(logPanel);
+		
+		add(quitBtn);
+		quitBtn.addActionListener(new QuitListener(controller));
 	}
 	
 	public void init()
@@ -64,7 +80,7 @@ public class GamePanel extends Panel {
 		GridSquare[][] gridData	= controller.getGrid();
 		gridBtn					= new JButton[gridData.length][gridData[0].length];
 		
-		board.setLayout(new GridLayout(gridData.length, gridData[0].length));
+		boardPanel.setLayout(new GridLayout(gridData.length, gridData[0].length));
 		
 		for(int col = 0; col < gridData.length; col++)
 		{
@@ -72,7 +88,7 @@ public class GamePanel extends Panel {
 			{
 				gridBtn[col][row] = new JButton();
 				gridBtn[col][row].addActionListener(new SquareListener(controller, col, row));
-				board.add(gridBtn[col][row]);
+				boardPanel.add(gridBtn[col][row]);
 			}
 		}
 	}
