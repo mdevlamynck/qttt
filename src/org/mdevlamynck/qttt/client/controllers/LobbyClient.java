@@ -3,7 +3,6 @@ package org.mdevlamynck.qttt.client.controllers;
 import java.awt.Panel;
 
 import org.mdevlamynck.qttt.client.MainFrame;
-import org.mdevlamynck.qttt.client.MainFrame.EScreen;
 import org.mdevlamynck.qttt.client.network.LobbyHandler;
 import org.mdevlamynck.qttt.client.network.NetworkInputHandler;
 import org.mdevlamynck.qttt.client.views.LobbyPanel;

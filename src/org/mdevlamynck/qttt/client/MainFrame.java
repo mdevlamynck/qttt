@@ -5,7 +5,6 @@ import java.awt.CardLayout;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 
-import org.mdevlamynck.qttt.client.controllers.BasicController;
 import org.mdevlamynck.qttt.client.controllers.ChooseServer;
 import org.mdevlamynck.qttt.client.controllers.GameClient;
 import org.mdevlamynck.qttt.client.controllers.LobbyClient;

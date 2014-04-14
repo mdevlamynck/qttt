@@ -4,7 +4,6 @@ package org.mdevlamynck.qttt.client.controllers;
 import java.awt.Panel;
 
 import org.mdevlamynck.qttt.client.MainFrame;
-import org.mdevlamynck.qttt.client.MainFrame.EScreen;
 import org.mdevlamynck.qttt.client.network.ChatHandler;
 import org.mdevlamynck.qttt.client.network.GameSessionHandler;
 import org.mdevlamynck.qttt.client.network.NetworkInputHandler;
@@ -23,7 +22,6 @@ public class GameClient extends BasicController {
 	private Turn				lastSelected		= new Turn();
 	private	int					squareSelected		= 0;
 
-	private NetworkInputHandler	network				= null;
 	private GameSessionHandler	game				= null;
 	private ChatHandler			chat				= null;
 	
@@ -46,8 +44,6 @@ public class GameClient extends BasicController {
 	
 	public void start(NetworkInputHandler network)
 	{
-		this.network	= network;
-		
 		this.game		= new GameSessionHandler(this, network.getServer());
 		this.chat		= new ChatHandler(this, network.getServer());
 		

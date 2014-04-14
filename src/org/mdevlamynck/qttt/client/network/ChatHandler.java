@@ -3,7 +3,6 @@ package org.mdevlamynck.qttt.client.network;
 import org.mdevlamynck.qttt.client.controllers.GameClient;
 import org.mdevlamynck.qttt.client.network.datastructs.Server;
 import org.mdevlamynck.qttt.common.network.BasicHandler;
-import org.mdevlamynck.qttt.common.network.ConcurrentQueue;
 import org.mdevlamynck.qttt.common.network.datastruct.OtherEndMessage;
 import org.mdevlamynck.qttt.common.network.messages.EPrefixes;
 
