@@ -93,4 +93,9 @@ public class GameServer {
 		return quit;
 	}
 
+	public LobbyHandler getLobbyHandler()
+	{
+		return lobbyHandler;
+	}
+
 }

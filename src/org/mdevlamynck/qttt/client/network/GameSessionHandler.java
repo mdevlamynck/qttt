@@ -33,32 +33,39 @@ public class GameSessionHandler extends BasicHandler {
 			{
 				line = readLine();
 				
-				if		( line.equals(EGame.START.toString())			)
-					controller.setPlayer	( Integer.parseInt(readLine()) == 1 ? EPlayer.P1 : EPlayer.P2	);
+				if		( line.startsWith(EGame.START.toString())			)
+					controller.setPlayer(
+						Integer.parseInt( line.substring(EGame.START.toString().length()) ) == 1
+							? EPlayer.P1
+							: EPlayer.P2
+					);
 			
-				else if	( line.equals(EGame.REQUEST_TURN.toString())	)
+				else if	( line.startsWith(EGame.REQUEST_TURN.toString())	)
 				{
 					new RequestTurn().start();
 				}
 
-				else if	( line.equals(EGame.REQUEST_CHOICE.toString())	)
+				else if	( line.startsWith(EGame.REQUEST_CHOICE.toString())	)
 				{
 					new RequestChoice().start();
 				}
 				
-				else if	( line.equals(EGame.OTHER_TURN.toString())		)
-					controller.addTurn		( new Turn().fromString(readLine()) );
+				else if	( line.startsWith(EGame.OTHER_TURN.toString())		)
+					controller.addTurn(	new Turn().fromString(
+						line.substring( EGame.OTHER_TURN.toString().length() )
+					));
 				
-				else if	( line.equals(EGame.OTHER_CHOICE.toString())	)
-					controller.addChoice	( Integer.parseInt(readLine()) 		);
+				else if	( line.startsWith(EGame.OTHER_CHOICE.toString())	)
+					controller.addChoice( Integer.parseInt(
+							line.substring( EGame.OTHER_CHOICE.toString().length() )
+						));
 
-				else if	( line.equals(EGame.FINISHED.toString())		)
+				else if	( line.startsWith(EGame.FINISHED.toString())		)
 				{
-					readLine();
 					break;
 				}
 
-				else if	( line.equals(EGame.INTERRUPTED.toString())		)
+				else if	( line.startsWith(EGame.INTERRUPTED.toString())		)
 				{
 					break;
 				}
@@ -76,8 +83,6 @@ public class GameSessionHandler extends BasicHandler {
 	{
 		String line = "";
 		line = server.game.pop();
-
-		System.out.println(line);
 
 		controller.addToLog(line, true);
 		return line;
@@ -101,7 +106,10 @@ public class GameSessionHandler extends BasicHandler {
 		{
 			Turn turn	= controller.getTurn();
 			if(turn != null)
-				writeLine	( turn.toString()				);
+				writeLine(
+					EGame.REPLY_TURN.toString() +
+					turn.toString()
+				);
 		}
 	}
 
@@ -112,7 +120,10 @@ public class GameSessionHandler extends BasicHandler {
 		{
 			int choice	= controller.getChoice();
 			if(choice != -1)
-				writeLine	( ((Integer)choice).toString()	);
+				writeLine(
+					EGame.REPLY_CHOICE.toString() +
+					((Integer)choice).toString()
+				);
 		}
 	}
 }

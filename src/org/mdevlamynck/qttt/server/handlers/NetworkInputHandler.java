@@ -22,11 +22,12 @@ public class NetworkInputHandler extends Thread {
 
 		System.out.println("Handling Client ...");
 
+		server					= g;
+
 		client					= new Client();
 		client.socket			= s;
 		client.readerHandler	= this;
-
-		server					= g;
+		client.lobbyHandler		= server.getLobbyHandler();
 	}
 
 	@Override

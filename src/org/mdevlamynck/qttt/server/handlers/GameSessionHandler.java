@@ -34,10 +34,8 @@ public class GameSessionHandler extends BasicHandler implements IHMBackend {
 		p1.gameHandler	= this;
 		p2.gameHandler	= this;
 		
-		writeLine(p1, EGame.START.toString());
-		writeLine(p1, "1");
-		writeLine(p2, EGame.START.toString());
-		writeLine(p2, "2");
+		writeLine(p1, EGame.START.toString() + "1");
+		writeLine(p2, EGame.START.toString() + "2");
 		
 		chat = new ChatHandler(p1, p2);
 		
@@ -86,7 +84,13 @@ public class GameSessionHandler extends BasicHandler implements IHMBackend {
 		
 		try
 		{
-			turn.fromString(mess.pop());
+			String reply = mess.pop();
+			while(!reply.startsWith(EGame.REPLY_TURN.toString()))
+			{
+				reply = mess.pop();
+			}
+
+			turn.fromString(reply.substring(EGame.REPLY_TURN.toString().length()));
 		}
 		catch(InterruptedException e)
 		{
@@ -117,7 +121,13 @@ public class GameSessionHandler extends BasicHandler implements IHMBackend {
 		
 		try
 		{
-			choose = Integer.parseInt(mess.pop());
+			String reply = mess.pop();
+			while(!reply.startsWith(EGame.REPLY_CHOICE.toString()))
+			{
+				reply = mess.pop();
+			}
+
+			choose = Integer.parseInt(reply.substring(EGame.REPLY_CHOICE.toString().length()));
 		}
 		catch(InterruptedException e)
 		{
@@ -129,11 +139,8 @@ public class GameSessionHandler extends BasicHandler implements IHMBackend {
 
 	@Override
 	public void gameFinished(GameResult result) {
-		writeLine(p1, EGame.FINISHED.toString());
-		writeLine(p1, result.toString());
-			
-		writeLine(p2, EGame.FINISHED.toString());
-		writeLine(p2, result.toString());
+		writeLine(p1, EGame.FINISHED.toString() + result.toString());
+		writeLine(p2, EGame.FINISHED.toString() + result.toString());
 	}
 
 	@Override
@@ -141,20 +148,14 @@ public class GameSessionHandler extends BasicHandler implements IHMBackend {
 		if(turn == null)
 			return;
 		
-		writeLine(p1, EGame.OTHER_TURN.toString());
-		writeLine(p1, turn.toString());
-			
-		writeLine(p2, EGame.OTHER_TURN.toString());
-		writeLine(p2, turn.toString());
+		writeLine(p1, EGame.OTHER_TURN.toString() + turn.toString());
+		writeLine(p2, EGame.OTHER_TURN.toString() + turn.toString());
 	}
 
 	@Override
 	public void choice(int choice) {
-		writeLine(p1, EGame.OTHER_CHOICE.toString());
-		writeLine(p1, ((Integer)choice).toString());
-			
-		writeLine(p2, EGame.OTHER_CHOICE.toString());
-		writeLine(p2, ((Integer)choice).toString());
+		writeLine(p1, EGame.OTHER_CHOICE.toString() + ((Integer)choice).toString());
+		writeLine(p2, EGame.OTHER_CHOICE.toString() + ((Integer)choice).toString());
 	}
 	
 	@Override

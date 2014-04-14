@@ -22,10 +22,11 @@ public class NetworkInputHandler extends Thread {
 		this.controller			= win;
 	}
 	
-	public boolean setServer(String addressServer, int portServer)
+	public boolean setServer(String name, String addressServer, int portServer)
 	{
-		this.address	= addressServer;
-		this.port		= portServer;
+		this.server.name	= name;
+		this.address		= addressServer;
+		this.port			= portServer;
 		
 		try
 		{
