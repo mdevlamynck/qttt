@@ -12,7 +12,7 @@ import javax.swing.JTextField;
 
 import org.mdevlamynck.qttt.client.controllers.GameClient;
 import org.mdevlamynck.qttt.client.controllers.listeners.ChatListener;
-import org.mdevlamynck.qttt.client.controllers.listeners.QuitListener;
+import org.mdevlamynck.qttt.client.controllers.listeners.GameQuitListener;
 import org.mdevlamynck.qttt.client.controllers.listeners.SquareListener;
 import org.mdevlamynck.qttt.common.gamelogic.datastruct.GridSquare;
 import org.mdevlamynck.qttt.common.gamelogic.datastruct.GridSquare.EPlayer;
@@ -72,7 +72,7 @@ public class GamePanel extends Panel {
 		bottomPanel.add		(logPanel);
 		
 		add(quitBtn);
-		quitBtn.addActionListener(new QuitListener(controller));
+		quitBtn.addActionListener(new GameQuitListener(controller));
 	}
 	
 	public void init()

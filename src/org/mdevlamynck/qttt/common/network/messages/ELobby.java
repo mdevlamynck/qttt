@@ -9,6 +9,9 @@ public enum ELobby {
 
 	CLIENT_NAME,			/// (Game)		param : name
 
+	REQUEST_CLIENT_LIST,	/// (Game)		reply : REPLY_CLIENT_LIST
+	REPLY_CLIENT_LIST,		/// (Server)	param : map<id, GameSession>
+
 	REQUEST_SESSION_LIST,	/// (Game)		reply : REPLY_SESSION_LIST
 	REPLY_SESSION_LIST,		/// (Server)	param : map<id, GameSession>
 

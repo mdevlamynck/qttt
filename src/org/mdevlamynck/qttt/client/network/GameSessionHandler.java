@@ -10,36 +10,36 @@ import org.mdevlamynck.qttt.common.network.messages.EGame;
 import org.mdevlamynck.qttt.common.network.messages.EPrefixes;
 
 public class GameSessionHandler extends BasicHandler {
-	
+
 	private GameClient				controller	= null;
 	private	Server					server		= null;
-	
+
 	public GameSessionHandler(GameClient controller, Server server)
 	{
 		handlerPrefix		= EPrefixes.GAME;
-		
+
 		this.controller		= controller;
 		this.server			= server;
 	}
-	
+
 	@Override
 	public void run()
 	{
 		String line = null;
-		
+
 		while(true)
 		{
 			try
 			{
 				line = readLine();
-				
+
 				if		( line.startsWith(EGame.START.toString())			)
 					controller.setPlayer(
-						Integer.parseInt( line.substring(EGame.START.toString().length()) ) == 1
+							Integer.parseInt( line.substring(EGame.START.toString().length()) ) == 1
 							? EPlayer.P1
 							: EPlayer.P2
-					);
-			
+							);
+
 				else if	( line.startsWith(EGame.REQUEST_TURN.toString())	)
 				{
 					new RequestTurn().start();
@@ -49,16 +49,16 @@ public class GameSessionHandler extends BasicHandler {
 				{
 					new RequestChoice().start();
 				}
-				
+
 				else if	( line.startsWith(EGame.OTHER_TURN.toString())		)
 					controller.addTurn(	new Turn().fromString(
-						line.substring( EGame.OTHER_TURN.toString().length() )
-					));
-				
+								line.substring( EGame.OTHER_TURN.toString().length() )
+								));
+
 				else if	( line.startsWith(EGame.OTHER_CHOICE.toString())	)
 					controller.addChoice( Integer.parseInt(
-							line.substring( EGame.OTHER_CHOICE.toString().length() )
-						));
+								line.substring( EGame.OTHER_CHOICE.toString().length() )
+								));
 
 				else if	( line.startsWith(EGame.FINISHED.toString())		)
 				{
@@ -87,7 +87,7 @@ public class GameSessionHandler extends BasicHandler {
 		controller.addToLog(line, true);
 		return line;
 	}
-	
+
 	private void writeLine(String line)
 	{
 		super.writeLine(server, line);
@@ -98,7 +98,7 @@ public class GameSessionHandler extends BasicHandler {
 	public void addMessage(OtherEndMessage mess) {
 		server.game.push(mess.message);
 	}
-	
+
 	private class RequestTurn extends Thread
 	{
 		@Override
@@ -107,9 +107,9 @@ public class GameSessionHandler extends BasicHandler {
 			Turn turn	= controller.getTurn();
 			if(turn != null)
 				writeLine(
-					EGame.REPLY_TURN.toString() +
-					turn.toString()
-				);
+						EGame.REPLY_TURN.toString() +
+						turn.toString()
+						);
 		}
 	}
 
@@ -121,9 +121,9 @@ public class GameSessionHandler extends BasicHandler {
 			int choice	= controller.getChoice();
 			if(choice != -1)
 				writeLine(
-					EGame.REPLY_CHOICE.toString() +
-					((Integer)choice).toString()
-				);
+						EGame.REPLY_CHOICE.toString() +
+						((Integer)choice).toString()
+						);
 		}
 	}
 }

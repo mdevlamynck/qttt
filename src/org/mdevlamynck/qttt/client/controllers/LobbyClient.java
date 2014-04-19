@@ -1,6 +1,7 @@
 package org.mdevlamynck.qttt.client.controllers;
 
 import java.awt.Panel;
+import java.io.IOException;
 import java.util.List;
 
 import org.mdevlamynck.qttt.client.MainFrame;
@@ -26,6 +27,9 @@ public class LobbyClient extends BasicController {
 
 		lobby			= new LobbyHandler(this, network.getServer());
 		lobby.start();
+
+		lobby.refreshSessions();
+		lobby.refreshClients();
 	}
 	
 	public Panel getPanel()
@@ -35,20 +39,53 @@ public class LobbyClient extends BasicController {
 	
 	public void quit()
 	{
+		try {
+			network.getServer().socket.close();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
 		network.interrupt();
 		lobby.interrupt();
 	}
 
-	public void toGame() {
+	public void toGame()
+	{
 		parent.launchGame();
 	}
 	
-	public void toChoose() {
+	public void toChoose()
+	{
 		parent.lostConnection();
 	}
 
-	public void setSession(List<String> sessions) {
+	public void refresh()
+	{
+		if(view.isSessions())
+		{
+			lobby.refreshSessions();
+			lobby.refreshClients();
+		}
+	}
+
+	public void setSession(List<String> sessions)
+	{
 		view.setSessions(sessions);
+	}
+
+	public void setClient(List<String> clients)
+	{
+		view.setClients(clients);
+	}
+
+	public void request()
+	{
+	}
+
+	public void create()
+	{
+		lobby.createGame();
 	}
 
 }
