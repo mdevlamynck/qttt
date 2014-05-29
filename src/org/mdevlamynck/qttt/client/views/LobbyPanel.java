@@ -17,6 +17,7 @@ import org.mdevlamynck.qttt.client.controllers.listeners.LobbyCreateListener;
 import org.mdevlamynck.qttt.client.controllers.listeners.LobbyQuitListener;
 import org.mdevlamynck.qttt.client.controllers.listeners.LobbyRefreshListener;
 import org.mdevlamynck.qttt.client.controllers.listeners.LobbyRequestListener;
+import org.mdevlamynck.qttt.common.network.datastruct.OtherEnd;
 
 public class LobbyPanel extends Panel {
 
@@ -53,6 +54,7 @@ public class LobbyPanel extends Panel {
 
 		sessionsTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 		sessionsTable.setPreferredSize(null);
+		sessionsData.addColumn("IDs");
 		sessionsData.addColumn("Game Sessions");
 
 		sessionsPane.setName("Game Sessions");
@@ -63,6 +65,7 @@ public class LobbyPanel extends Panel {
 
 		clientsTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 		clientsTable.setPreferredSize(null);
+		clientsData.addColumn("IDs");
 		clientsData.addColumn("Other Players");
 
 		clientsPane.setName("Other Players");
@@ -81,31 +84,31 @@ public class LobbyPanel extends Panel {
 		refreshBtn	.addActionListener( new LobbyRefreshListener(controller)	);
 	}
 
-	public void setSessions(List<String> sessions)
+	public void setSessions(List<OtherEnd> sessions)
 	{
 		synchronized (sessions)
 		{
 			while(sessionsData.getRowCount() > 0)
 				sessionsData.removeRow(0);
 
-			for(String s : sessions)
+			for(OtherEnd s : sessions)
 			{
-				Object[] obj = {s};
+				Object[] obj = {s.id, s.name};
 				sessionsData.addRow(obj);
 			}		
 		}
 	}
 
-	public void setClients(List<String> clients)
+	public void setClients(List<OtherEnd> clients)
 	{
 		synchronized (clients)
 		{
 			while(clientsData.getRowCount() > 0)
 				clientsData.removeRow(0);
 
-			for(String c : clients)
+			for(OtherEnd c : clients)
 			{
-				Object[] obj = {c};
+				Object[] obj = {c.id, c.name};
 				clientsData.addRow(obj);
 			}
 		}
@@ -114,6 +117,10 @@ public class LobbyPanel extends Panel {
 	public boolean isSessions()
 	{
 		return true;
+	}
+
+	public int getSelectedRow() {
+		return sessionsTable.getSelectedRow();
 	}
 
 }

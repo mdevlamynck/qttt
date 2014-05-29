@@ -2,6 +2,7 @@ package org.mdevlamynck.qttt.server.handlers;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 import org.mdevlamynck.qttt.common.network.BasicHandler;
 import org.mdevlamynck.qttt.common.network.ConcurrentQueue;
@@ -51,6 +52,8 @@ public class LobbyHandler extends BasicHandler {
 
 				else if	(mess.message.startsWith(ELobby.CREATE_SESSION.toString()))
 					requestCreateGame( (Client) mess.client );
+				else if	(mess.message.startsWith(ELobby.CONNECT_TO_GAME.toString()))
+					requestJoinGame( (Client) mess.client, mess.message.substring(ELobby.CONNECT_TO_GAME.toString().length()) );
 			}
 			catch(InterruptedException e)
 			{
@@ -131,7 +134,7 @@ public class LobbyHandler extends BasicHandler {
 		for(Client c : clients)
 		{
 			if(!client.equals(c))
-				clientsLine += c.name + " ";
+				clientsLine += c.id.toString() + " " + c.name + " ";
 		}
 		writeLine(client, clientsLine);
 	}
@@ -142,7 +145,7 @@ public class LobbyHandler extends BasicHandler {
 		for(GameSessionHandler s : sessions)
 		{
 			if(!s.isAlive())
-				clientsLine += s.getClient1().name + " ";
+				clientsLine += s.getClient1().id.toString() + " " + s.getClient1().name + " ";
 		}
 		writeLine(client, clientsLine);
 	}
@@ -153,6 +156,34 @@ public class LobbyHandler extends BasicHandler {
 		newGame.setClient1(client);
 
 		sessions.add(newGame);
+	}
+
+	public void requestJoinGame(Client clientToAdd, String clientCreatedGame)
+	{
+		UUID	createdGame	= UUID.fromString(clientCreatedGame);
+
+		if(clientToAdd.id.equals(createdGame))
+			return;
+
+		GameSessionHandler	session	= null;
+		for(GameSessionHandler s : sessions)
+		{
+			if(s.getClient1().id.equals(createdGame))
+			{
+				session = s;
+				break;
+			}
+		}
+
+		if(session != null)
+		{
+			session.setClient2(clientToAdd);
+
+			writeLine( session.getClient1(),	ELobby.START.toString()	);
+			writeLine( session.getClient2(),	ELobby.START.toString()	);
+
+			session.start();
+		}
 	}
 
 	@Override

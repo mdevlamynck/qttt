@@ -3,6 +3,7 @@ package org.mdevlamynck.qttt.server.handlers;
 import java.io.PrintWriter;
 import java.net.Socket;
 import java.util.Scanner;
+import java.util.UUID;
 
 import org.mdevlamynck.qttt.common.network.datastruct.OtherEndMessage;
 import org.mdevlamynck.qttt.common.network.messages.EServer;
@@ -25,6 +26,8 @@ public class NetworkInputHandler extends Thread {
 		server					= g;
 
 		client					= new Client();
+		client.id				= UUID.randomUUID();
+		System.out.println(client.id.toString());
 		client.socket			= s;
 		client.readerHandler	= this;
 		client.lobbyHandler		= server.getLobbyHandler();
@@ -53,6 +56,7 @@ public class NetworkInputHandler extends Thread {
 			try
 			{
 				String message = client.in.nextLine();
+				System.out.println(message);
 
 				if		(message.equals(EServer.STOP.toString()))
 				{

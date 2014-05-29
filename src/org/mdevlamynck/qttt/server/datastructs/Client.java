@@ -1,5 +1,7 @@
 package org.mdevlamynck.qttt.server.datastructs;
 
+import java.util.UUID;
+
 import org.mdevlamynck.qttt.common.network.datastruct.OtherEnd;
 import org.mdevlamynck.qttt.server.handlers.ChatHandler;
 import org.mdevlamynck.qttt.server.handlers.NetworkInputHandler;

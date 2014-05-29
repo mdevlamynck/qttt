@@ -5,6 +5,7 @@ import java.io.PrintWriter;
 import java.net.Socket;
 import java.util.NoSuchElementException;
 import java.util.Scanner;
+import java.util.UUID;
 
 import org.mdevlamynck.qttt.client.MainFrame;
 import org.mdevlamynck.qttt.client.network.datastructs.Server;

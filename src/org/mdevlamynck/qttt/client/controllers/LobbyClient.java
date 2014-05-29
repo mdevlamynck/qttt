@@ -1,3 +1,4 @@
+
 package org.mdevlamynck.qttt.client.controllers;
 
 import java.awt.Panel;
@@ -8,6 +9,7 @@ import org.mdevlamynck.qttt.client.MainFrame;
 import org.mdevlamynck.qttt.client.network.LobbyHandler;
 import org.mdevlamynck.qttt.client.network.NetworkInputHandler;
 import org.mdevlamynck.qttt.client.views.LobbyPanel;
+import org.mdevlamynck.qttt.common.network.datastruct.OtherEnd;
 
 public class LobbyClient extends BasicController {
 
@@ -69,23 +71,25 @@ public class LobbyClient extends BasicController {
 		}
 	}
 
-	public void setSession(List<String> sessions)
+	public void setSession(List<OtherEnd> sessions)
 	{
 		view.setSessions(sessions);
 	}
 
-	public void setClient(List<String> clients)
+	public void setClient(List<OtherEnd> clients)
 	{
 		view.setClients(clients);
 	}
 
 	public void request()
 	{
+		lobby.joinGame(view.getSelectedRow());
 	}
 
 	public void create()
 	{
 		lobby.createGame();
+		lobby.refreshSessions();
 	}
 
 }

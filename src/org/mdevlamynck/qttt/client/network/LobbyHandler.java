@@ -2,19 +2,23 @@ package org.mdevlamynck.qttt.client.network;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 import org.mdevlamynck.qttt.client.controllers.LobbyClient;
 import org.mdevlamynck.qttt.client.network.datastructs.Server;
 import org.mdevlamynck.qttt.common.network.BasicHandler;
+import org.mdevlamynck.qttt.common.network.datastruct.OtherEnd;
 import org.mdevlamynck.qttt.common.network.datastruct.OtherEndMessage;
-import org.mdevlamynck.qttt.common.network.messages.EGame;
 import org.mdevlamynck.qttt.common.network.messages.ELobby;
 import org.mdevlamynck.qttt.common.network.messages.EPrefixes;
 
 public class LobbyHandler extends BasicHandler {
 
-	private LobbyClient	controller	= null;
-	private	Server		server		= null;
+	private LobbyClient		controller		= null;
+	private	Server			server			= null;
+
+	private List<OtherEnd>	otherClients	= new ArrayList<OtherEnd>();
+	private List<OtherEnd>	gamesSessions	= new ArrayList<OtherEnd>();
 
 	public LobbyHandler(LobbyClient controller, Server server)
 	{
@@ -77,33 +81,71 @@ public class LobbyHandler extends BasicHandler {
 
 	private void updateSessionList(String sessionsLine)
 	{
-		List<String> sessions	= new ArrayList<String>();
+		OtherEnd	client	= null;
 
+		gamesSessions.clear();
+
+		int i = 0;
 		for(String s : sessionsLine.split(" "))
 		{
 			if(!s.isEmpty())
-				sessions.add(s);
+			{
+				if((i % 2) == 0)
+				{
+					client		= new OtherEnd();
+					client.id	= UUID.fromString(s);
+				}
+				else
+				{
+					client.name	= s;
+					gamesSessions.add(client);
+				}
+
+				i++;
+			}
 		}
 
-		controller.setSession(sessions);
+		controller.setSession(gamesSessions);
 	}
 
 	private void updateClientList(String clientsLine)
 	{
-		List<String> clients	= new ArrayList<String>();
+		OtherEnd	client	= null;
 
+		otherClients.clear();
+
+		int i = 0;
 		for(String s : clientsLine.split(" "))
 		{
 			if(!s.isEmpty())
-				clients.add(s);
+			{
+				if((i % 2) == 0)
+				{
+					client		= new OtherEnd();
+					client.id	= UUID.fromString(s);
+				}
+				else
+				{
+					client.name	= s;
+					otherClients.add(client);
+				}
+
+				i++;
+			}
 		}
 
-		controller.setClient(clients);
+		controller.setClient(otherClients);
 	}
 
 	public void createGame()
 	{
 		writeLine(server, ELobby.CREATE_SESSION.toString());
+	}
+
+	public void joinGame(int selectedRow) {
+		OtherEnd gameSession	= gamesSessions.get(selectedRow);
+
+		writeLine(server, ELobby.CONNECT_TO_GAME.toString() + gameSession.id.toString());
 	}
 
 }
